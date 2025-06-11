@@ -146,13 +146,28 @@ interface Industry {
 
 ## 🔄 API Response Format
 
-### Expected JSON Response Format:
+### Expected JSON Response Format for List Endpoints:
 ```json
 {
-  "data": [...],           // For list endpoints
-  "id": "...",            // For single item endpoints
-  "message": "Success",    // Optional status message
-  "status": "success"      // Optional status indicator
+  "count": 15,
+  "next": null,
+  "previous": null,
+  "results": [
+    {
+      "id": "...",
+      "name": "...",
+      // ... other fields
+    }
+  ]
+}
+```
+
+### Expected JSON Response Format for Single Item Endpoints:
+```json
+{
+  "id": "...",
+  "name": "...",
+  // ... other fields
 }
 ```
 
@@ -164,6 +179,8 @@ interface Industry {
   "code": 400
 }
 ```
+
+**Note**: The frontend automatically extracts the `results` array from paginated responses, so Django REST Framework's default pagination format is fully supported.
 
 ## 🛠️ CORS Configuration Needed
 
