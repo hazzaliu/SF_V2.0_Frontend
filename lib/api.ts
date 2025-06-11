@@ -191,8 +191,9 @@ export async function getProjects(): Promise<Project[]> {
   }
   
   try {
-    const data = await apiCall<Project[]>(API_ENDPOINTS.projects)
-    return data
+    const response = await apiCall<{results: Project[]}>(API_ENDPOINTS.projects)
+    // Extract the results array from the paginated response
+    return response.results || []
   } catch (error) {
     console.warn("API call failed, falling back to mock data:", error)
     return mockProjects
@@ -326,8 +327,9 @@ export async function getMethodologies(): Promise<Methodology[]> {
   }
   
   try {
-    const data = await apiCall<Methodology[]>(API_ENDPOINTS.methodologies)
-    return data
+    const response = await apiCall<{results: Methodology[]}>(API_ENDPOINTS.methodologies)
+    // Extract the results array from the paginated response
+    return response.results || []
   } catch (error) {
     console.warn("API call failed, falling back to mock data:", error)
     return mockMethodologies
@@ -342,8 +344,9 @@ export async function getIndustries(): Promise<Industry[]> {
   }
   
   try {
-    const data = await apiCall<Industry[]>(API_ENDPOINTS.industries)
-    return data
+    const response = await apiCall<{results: Industry[]}>(API_ENDPOINTS.industries)
+    // Extract the results array from the paginated response
+    return response.results || []
   } catch (error) {
     console.warn("API call failed, falling back to mock data:", error)
     return mockIndustries
