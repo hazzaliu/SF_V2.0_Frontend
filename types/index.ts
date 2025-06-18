@@ -15,6 +15,13 @@ export interface ProjectVariable {
   value: string
 }
 
+export interface TrackedSupplier {
+  id?: string
+  code: string
+  name: string
+  is_prophecy_supplier: boolean
+}
+
 export interface Project {
   id: string
   client_name: string
@@ -34,6 +41,9 @@ export interface Project {
   addressable_market?: string // From ProjectSetup.html
   streams?: string // From ProjectSetup.html
   template_variables?: ProjectVariable[] // From ProjectSetup.html
+  tracked_suppliers?: TrackedSupplier[] // Tracked suppliers for the project
+  category?: string // Product/service category
+  target_audience?: string // Target audience description
   status: "Draft" | "In Progress" | "Completed"
   last_modified: string // ISO date string
   question_count?: number // For dashboard
@@ -45,10 +55,20 @@ export interface Project {
 
 export interface SurveySection {
   id: string
-  name: string
-  description?: string
+  project_id: string
+  section_template_id: string
+  section_template_name: string
+  custom_title: string
+  position: number
+  ai_generated_notes: string
+  loi: number | null
+  created_at: string
+  updated_at: string
   questions: SurveyQuestion[]
-  order: number
+  // Legacy fields for backward compatibility
+  name?: string
+  description?: string
+  order?: number
 }
 
 export interface SurveyQuestion {
@@ -96,5 +116,6 @@ export interface CreateProjectFormProps {
       | "estimated_duration"
       | "survey_sections"
     >,
+    designBriefFile?: File
   ) => Promise<void>
 }

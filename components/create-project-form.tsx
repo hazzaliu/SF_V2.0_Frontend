@@ -7,11 +7,12 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
-import type { CreateProjectFormProps, Project, ProjectVariable } from "@/types"
+import type { CreateProjectFormProps, Project, ProjectVariable, TrackedSupplier } from "@/types"
 import { useToast } from "@/components/ui/use-toast"
 import { InfoIcon, Loader2Icon, UploadCloudIcon, FileIcon, XIcon } from "lucide-react"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { Badge } from "@/components/ui/badge"
+import TrackedSupplierList from "@/components/tracked-supplier-list"
 
 const initialTemplateVariables: ProjectVariable[] = [
   { name: "Action", value: "" },
@@ -58,6 +59,7 @@ export default function CreateProjectForm({ methodologies, industries, onProject
     addressable_market: "",
     streams: "",
     template_variables: initialTemplateVariables.map((v) => ({ ...v })), // Deep copy
+    tracked_suppliers: [], // Add tracked suppliers
     design_brief_file_name: "", // Add this
   })
 
@@ -80,11 +82,47 @@ export default function CreateProjectForm({ methodologies, industries, onProject
     })
   }
 
+  const handleTrackedSuppliersChange = (suppliers: TrackedSupplier[]) => {
+    setFormData((prev) => ({ ...prev, tracked_suppliers: suppliers }))
+  }
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0]
+      
+      // Validate file type
+      if (!file.name.toLowerCase().endsWith('.docx')) {
+        toast({
+          title: "Invalid File Type",
+          description: "Please upload a .docx document. Other file formats are not supported.",
+          variant: "destructive",
+        })
+        // Clear the file input
+        e.target.value = ""
+        return
+      }
+      
+      // Validate file size (10MB limit)
+      const maxSize = 10 * 1024 * 1024 // 10MB
+      if (file.size > maxSize) {
+        toast({
+          title: "File Too Large",
+          description: "File size must be less than 10MB. Please choose a smaller file.",
+          variant: "destructive",
+        })
+        // Clear the file input
+        e.target.value = ""
+        return
+      }
+      
       setDesignBriefFile(file)
       setFormData((prev) => ({ ...prev, design_brief_file_name: file.name }))
+      
+      toast({
+        title: "File Selected",
+        description: `Successfully selected: ${file.name}`,
+        variant: "default",
+      })
     }
   }
 
@@ -111,6 +149,7 @@ export default function CreateProjectForm({ methodologies, industries, onProject
     if (!formData.loi) errors.push("Length of Interview is required")
     if (!formData.target_country) errors.push("Target country is required")
     if (!formData.sample_type) errors.push("Sample type is required")
+    if (!designBriefFile) errors.push("Design brief file (.docx) is required")
 
     return errors
   }
@@ -130,12 +169,7 @@ export default function CreateProjectForm({ methodologies, industries, onProject
 
     setIsSubmitting(true)
     try {
-      // Inside handleSubmit, before onProjectCreate
-      // if (designBriefFile) {
-      //   // Here you would append designBriefFile to a FormData object
-      //   // For now, formData.design_brief_file_name is already set
-      // }
-      await onProjectCreate(formData)
+      await onProjectCreate(formData, designBriefFile || undefined)
     } catch (error) {
       console.error("Failed to create project:", error)
       // Error handling is done in the parent component
@@ -401,6 +435,12 @@ export default function CreateProjectForm({ methodologies, industries, onProject
           </CardContent>
         </Card>
 
+        {/* Tracked Suppliers Section */}
+        <TrackedSupplierList
+          suppliers={formData.tracked_suppliers || []}
+          onChange={handleTrackedSuppliersChange}
+        />
+
         {/* Project Assets Section */}
         <Card>
           <CardHeader>
@@ -410,7 +450,20 @@ export default function CreateProjectForm({ methodologies, industries, onProject
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <Label htmlFor="design_brief_file">Design Overview Brief</Label>
+              <Label htmlFor="design_brief_file">
+                Design Overview Brief (.docx) <span className="text-red-500">*</span>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <InfoIcon className="h-3 w-3 ml-1 text-muted-foreground cursor-help" />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Upload a .docx file with a 3-column table:</p>
+                    <p>Column 1: Section Name</p>
+                    <p>Column 2: Description</p>
+                    <p>Column 3: LOI (Length of Interview in minutes)</p>
+                  </TooltipContent>
+                </Tooltip>
+              </Label>
               <div
                 className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-dashed rounded-md cursor-pointer hover:border-primary/70 transition-colors"
                 onClick={() => document.getElementById("design_brief_file")?.click()}
@@ -426,12 +479,12 @@ export default function CreateProjectForm({ methodologies, industries, onProject
                         type="file"
                         className="sr-only"
                         onChange={handleFileChange}
-                        accept=".pdf,.doc,.docx,.txt,.md,image/*" // Specify acceptable file types
+                        accept=".docx" // Only accept .docx files
                       />
                     </span>
                     <p className="pl-1">or drag and drop</p>
                   </div>
-                  <p className="text-xs text-muted-foreground">PDF, DOCX, TXT, MD, Images up to 10MB</p>
+                  <p className="text-xs text-muted-foreground">DOCX documents only, up to 10MB</p>
                 </div>
               </div>
               {designBriefFile && (

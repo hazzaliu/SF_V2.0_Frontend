@@ -1,7 +1,7 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
-import { useParams, useRouter } from "next/navigation"
+import { useState, useEffect, useCallback, useMemo } from "react"
+import { useParams, useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -10,633 +10,1379 @@ import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import Header from "@/components/header"
 import WorkflowNavigation from "@/components/workflow-navigation"
-import { getProjectById } from "@/lib/api"
+import { getProjectById, getProjectSectionsDetailed, generateAIQuestions, repromptQuestions, getQuestionRepromptOptions, saveProjectQuestions, updateProjectStatus, exportProject as apiExportProject, GeneratedQuestion, QuestionRepromptOption, ProjectSection, getUserSessionId } from "@/lib/api"
 import { useToast } from "@/components/ui/use-toast"
+import { Loader2, RefreshCw, ChevronDown, ChevronUp, Sparkles, FileText, Edit, Trash2, GripVertical } from "lucide-react"
 import {
-  ArrowLeftIcon,
-  EditIcon,
-  SparklesIcon,
-  PlusIcon,
-  TrashIcon,
-  CopyIcon,
-  RefreshCwIcon,
-  Loader2Icon,
-  ChevronDownIcon,
-  ChevronUpIcon,
-  WandIcon,
-} from "lucide-react"
-import type { Project } from "@/types"
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core'
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable'
+import {
+  useSortable,
+} from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
 
-// Define types for questions and sections
-interface QuestionOption {
-  id: string
-  text: string
-  order: number
-}
-
-interface Question {
-  id: string
-  sectionId: string
-  questionNumber: string
-  text: string
-  type: "single-choice" | "multiple-choice" | "open-text" | "likert-scale" | "rating" | "ranking"
-  options?: QuestionOption[]
-  isRequired: boolean
-  isAiGenerated: boolean
-  aiSuggestions?: string[]
-  order: number
-}
-
-interface SurveySection {
+// Types for backend data
+interface BackendSection {
   id: string
   name: string
   description: string
-  type: "basic" | "prophecy" | "cx" | "choice"
-  questions: Question[]
+  section_type: string
+  static_content?: any // Allow any structure since backend varies
+}
+
+interface ProcessedSection extends ProjectSection {
+  questions: GeneratedQuestion[]
+  isGenerating: boolean
+  generationError?: string
   isExpanded: boolean
 }
 
-// Mock data for demonstration
-const mockSections: SurveySection[] = [
-  {
-    id: "screeners",
-    name: "Screeners",
-    description: "Essential screening questions to qualify respondents",
-    type: "basic",
-    isExpanded: true,
-    questions: [
-      {
-        id: "q1",
-        sectionId: "screeners",
-        questionNumber: "S1",
-        text: "What is your age?",
-        type: "single-choice",
-        options: [
-          { id: "opt1", text: "18-24", order: 1 },
-          { id: "opt2", text: "25-34", order: 2 },
-          { id: "opt3", text: "35-44", order: 3 },
-          { id: "opt4", text: "45-54", order: 4 },
-          { id: "opt5", text: "55-64", order: 5 },
-          { id: "opt6", text: "65+", order: 6 },
-        ],
-        isRequired: true,
-        isAiGenerated: true,
-        aiSuggestions: [
-          "What age group do you belong to?",
-          "Please select your age range:",
-          "Which of the following age categories best describes you?",
-        ],
-        order: 1,
-      },
-      {
-        id: "q2",
-        sectionId: "screeners",
-        questionNumber: "S2",
-        text: "Do you currently use any social media platforms?",
-        type: "single-choice",
-        options: [
-          { id: "opt7", text: "Yes, regularly (daily)", order: 1 },
-          { id: "opt8", text: "Yes, occasionally (weekly)", order: 2 },
-          { id: "opt9", text: "Rarely (monthly or less)", order: 3 },
-          { id: "opt10", text: "No, I don't use social media", order: 4 },
-        ],
-        isRequired: true,
-        isAiGenerated: true,
-        aiSuggestions: [
-          "How frequently do you use social media platforms?",
-          "Which best describes your social media usage?",
-          "Do you actively engage with social media?",
-        ],
-        order: 2,
-      },
-    ],
-  },
-  // More sections...
-]
+// Streamlined Generated Question Card Component
+function GeneratedQuestionCard({
+  question,
+  qIndex,
+  isDriverSection,
+  sectionName,
+  editingQuestion,
+  setEditingQuestion,
+  editedText,
+  setEditedText,
+  rewriteExpanded,
+  setRewriteExpanded,
+  rewriteFeedback,
+  setRewriteFeedback,
+  onSaveEdit,
+  onDelete,
+  onRewrite,
+  isSubmittingFeedback,
+  editedQuestions,
+  rewrittenQuestions
+}: {
+  question: GeneratedQuestion
+  qIndex: number
+  isDriverSection: boolean
+  sectionName: string
+  editingQuestion: string | null
+  setEditingQuestion: (id: string | null) => void
+  editedText: string
+  setEditedText: (text: string) => void
+  rewriteExpanded: string | null
+  setRewriteExpanded: (id: string | null) => void
+  rewriteFeedback: Record<string, string>
+  setRewriteFeedback: React.Dispatch<React.SetStateAction<Record<string, string>>>
+  onSaveEdit: () => void
+  onDelete: () => void
+  onRewrite: (feedbackText?: string) => void
+  isSubmittingFeedback: boolean
+  editedQuestions: string[]
+  rewrittenQuestions: string[]
+}) {
+  const isEditing = editingQuestion === question.id
+  const isRewriteExpanded = rewriteExpanded === question.id
+  
+  // Local state for feedback input to avoid updating parent on every keystroke
+  const [localFeedback, setLocalFeedback] = useState(rewriteFeedback[question.id] || "")
+  
+  // Update local feedback when the question changes or when rewrite section expands
+  useEffect(() => {
+    if (isRewriteExpanded) {
+      setLocalFeedback(rewriteFeedback[question.id] || "")
+    }
+  }, [isRewriteExpanded, rewriteFeedback, question.id])
+  
+  // Handle rewrite with feedback - only save feedback when actually submitting
+  const handleRewriteClick = () => {
+    // Save the feedback to parent state only when clicking rewrite
+    setRewriteFeedback(prev => ({ ...prev, [question.id]: localFeedback }))
+    // Pass the feedback directly to avoid async state issues
+    onRewrite(localFeedback)
+  }
+
+  return (
+    <div className="bg-white border border-gray-200 rounded-lg p-3 hover:border-gray-300 transition-colors">
+      <div className="flex items-start justify-between">
+        {/* Question Text */}
+        <div className="flex-1 mr-3">
+          {isEditing ? (
+            <div className="space-y-2">
+              <Textarea
+                value={editedText}
+                onChange={(e) => setEditedText(e.target.value)}
+                className="text-sm resize-none"
+                rows={2}
+              />
+              <div className="flex gap-2">
+                <Button 
+                  size="sm" 
+                  onClick={onSaveEdit}
+                  className="h-7 px-2 text-xs"
+                >
+                  Save
+                </Button>
+                <Button 
+                  size="sm" 
+                  variant="outline"
+                  onClick={() => setEditingQuestion(null)}
+                  className="h-7 px-2 text-xs"
+                >
+                  Cancel
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <p className="text-sm text-gray-900 leading-relaxed">
+              {(() => {
+                const isAttitudinalSection = sectionName.toLowerCase().includes('attitudinal')
+                if (isDriverSection) {
+                  return `D${qIndex + 1}: ${question.text}`
+                } else if (isAttitudinalSection) {
+                  return question.text // Attitudinal statements don't need Q numbering
+                } else {
+                  return `Q${qIndex + 1}: ${question.text}`
+                }
+              })()}
+            </p>
+          )}
+          
+          {/* Status Badges */}
+          <div className="flex gap-2 mt-2 flex-wrap">
+            {editedQuestions.includes(question.id) && (
+              <Badge variant="outline" className="text-xs bg-blue-50 text-blue-700 border-blue-200">
+                <Edit className="h-3 w-3 mr-1" />
+                Edited
+              </Badge>
+            )}
+            {rewrittenQuestions.includes(question.id) && (
+              <Badge variant="outline" className="text-xs bg-green-50 text-green-700 border-green-200">
+                <Sparkles className="h-3 w-3 mr-1" />
+                AI Rewritten
+              </Badge>
+            )}
+            {rewriteFeedback[question.id] && rewriteFeedback[question.id].trim() && (
+              <Badge variant="outline" className="text-xs bg-amber-50 text-amber-700 border-amber-200">
+                💬 Feedback: "{rewriteFeedback[question.id].substring(0, 30)}{rewriteFeedback[question.id].length > 30 ? '...' : ''}"
+              </Badge>
+            )}
+          </div>
+          
+          {/* Scale info for drivers and attitudinals */}
+          {isDriverSection && question.scale_min !== undefined && question.scale_max !== undefined && (
+            <p className="text-xs text-blue-600 mt-1">
+              {question.scale_min}-{question.scale_max} scale
+            </p>
+          )}
+          {sectionName.toLowerCase().includes('attitudinal') && (
+            <p className="text-xs text-purple-600 mt-1">
+              0-10 agreement scale (0 = Completely disagree, 10 = Completely agree)
+            </p>
+          )}
+          
+          {/* Question Options */}
+          {!isDriverSection && question.options && question.options.length > 0 && (
+            <div className="mt-2">
+              <p className="text-xs text-gray-500 mb-1">Answer Options:</p>
+              <div className="flex flex-wrap gap-1">
+                {question.options.map((option, index) => (
+                  <span 
+                    key={index}
+                    className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded border"
+                  >
+                    {option}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex gap-1 flex-shrink-0">
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={() => {
+              setRewriteExpanded(isRewriteExpanded ? null : question.id)
+              setRewriteFeedback(prev => ({ ...prev, [question.id]: prev[question.id] || "" }))
+            }}
+            className="h-7 px-2 text-xs text-blue-600 hover:text-blue-700"
+            disabled={isSubmittingFeedback}
+          >
+            <RefreshCw className="h-3 w-3 mr-1" />
+            Rewrite
+          </Button>
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={() => {
+              setEditingQuestion(question.id)
+              setEditedText(question.text)
+            }}
+            className="h-7 px-2 text-xs text-gray-600 hover:text-gray-700"
+          >
+            <Edit className="h-3 w-3 mr-1" />
+            Edit
+          </Button>
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={onDelete}
+            className="h-7 px-2 text-xs text-red-600 hover:text-red-700"
+          >
+            <Trash2 className="h-3 w-3" />
+          </Button>
+        </div>
+      </div>
+
+      {/* Rewrite Feedback Expansion */}
+      {isRewriteExpanded && (
+        <div className="mt-3 pt-3 border-t border-gray-100 space-y-2">
+          <Label className="text-xs font-medium text-gray-700">
+            Provide feedback for rewriting:
+          </Label>
+          <Textarea
+            value={localFeedback}
+            onChange={(e) => setLocalFeedback(e.target.value)}
+            placeholder={isDriverSection 
+              ? "e.g., Make this driver more specific, focus on different attributes..."
+              : "e.g., Make it more specific, change the tone, add more options..."
+            }
+            className="text-xs resize-none"
+            rows={2}
+          />
+          <div className="flex gap-2">
+            <Button
+              size="sm"
+              onClick={handleRewriteClick}
+              disabled={isSubmittingFeedback}
+              className="h-7 px-2 text-xs"
+            >
+              {isSubmittingFeedback ? (
+                <>
+                  <Loader2 className="h-3 w-3 animate-spin mr-1" />
+                  Rewriting...
+                </>
+              ) : (
+                "Rewrite with AI"
+              )}
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => setRewriteExpanded(null)}
+              className="h-7 px-2 text-xs"
+            >
+              Cancel
+            </Button>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+// Sortable Section Component
+function SortableSection({ 
+  section, 
+  toggleSection, 
+  renderStaticContent, 
+  editingSection, 
+  setEditingSection, 
+  openRewriteModal,
+  generateQuestionsForSection,
+  feedbackText,
+  setFeedbackText,
+  selectedRepromptOption,
+  setSelectedRepromptOption,
+  repromptOptions,
+  submitFeedbackAndRegenerate,
+  isSubmittingFeedback,
+  editingQuestion,
+  setEditingQuestion,
+  editedText,
+  setEditedText,
+  rewriteExpanded,
+  setRewriteExpanded,
+  rewriteFeedback,
+  setRewriteFeedback,
+  handleSaveEdit,
+  handleDeleteQuestion,
+  handleRewriteWithFeedback,
+  editedQuestions,
+  rewrittenQuestions
+}: {
+  section: ProcessedSection
+  toggleSection: (id: string) => void
+  renderStaticContent: (content: any) => React.ReactNode
+  editingSection: string | null
+  setEditingSection: (id: string | null) => void
+  openRewriteModal: (id: string) => void
+  generateQuestionsForSection: (id: string, name: string) => void
+  feedbackText: Record<string, string>
+  setFeedbackText: React.Dispatch<React.SetStateAction<Record<string, string>>>
+  selectedRepromptOption: string
+  setSelectedRepromptOption: (option: string) => void
+  repromptOptions: QuestionRepromptOption[]
+  submitFeedbackAndRegenerate: (questionId: string, feedback: string) => void
+  isSubmittingFeedback: string | null
+  editingQuestion: string | null
+  setEditingQuestion: (id: string | null) => void
+  editedText: string
+  setEditedText: (text: string) => void
+  rewriteExpanded: string | null
+  setRewriteExpanded: (id: string | null) => void
+  rewriteFeedback: Record<string, string>
+  setRewriteFeedback: React.Dispatch<React.SetStateAction<Record<string, string>>>
+  handleSaveEdit: (questionId: string) => void
+  handleDeleteQuestion: (questionId: string) => void
+  handleRewriteWithFeedback: (questionId: string, feedbackText?: string) => void
+  editedQuestions: string[]
+  rewrittenQuestions: string[]
+}) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+  } = useSortable({ id: section.id })
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  }
+
+  return (
+    <Card ref={setNodeRef} style={style} className="overflow-hidden">
+      <CardHeader 
+        className="cursor-pointer"
+        onClick={() => toggleSection(section.id)}
+      >
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-2">
+            <div 
+              className="cursor-grab active:cursor-grabbing p-1"
+              {...attributes}
+              {...listeners}
+            >
+              <GripVertical className="h-4 w-4 text-gray-400" />
+            </div>
+            <CardTitle className="text-lg">{section.name}</CardTitle>
+            {section.questions.length > 0 && (
+              <Badge variant="default">
+                <Sparkles className="h-3 w-3 mr-1" />
+                {section.questions.length} Questions
+              </Badge>
+            )}
+          </div>
+          <div className="flex items-center space-x-2">
+            {section.isGenerating && (
+              <Loader2 className="h-4 w-4 animate-spin text-blue-600" />
+            )}
+            {section.isExpanded ? (
+              <ChevronUp className="h-4 w-4" />
+            ) : (
+              <ChevronDown className="h-4 w-4" />
+            )}
+          </div>
+        </div>
+        {section.description && (
+          <CardDescription>{section.description}</CardDescription>
+        )}
+      </CardHeader>
+
+      {section.isExpanded && (
+        <CardContent className="space-y-6">
+          {/* Static Content */}
+          {section.static_content && section.is_static && (
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <h4 className="font-semibold text-gray-900 flex items-center">
+                  <FileText className="h-4 w-4 mr-2" />
+                  Static Content
+                </h4>
+              </div>
+              <div className="bg-gray-50 p-4 rounded-lg border">
+                {renderStaticContent(section.static_content)}
+              </div>
+            </div>
+          )}
+
+
+          {/* Generation Error */}
+          {section.generationError && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+              <p className="text-red-700 text-sm">{section.generationError}</p>
+              <Button 
+                onClick={async () => {
+                  try {
+                    await generateQuestionsForSection(section.id, section.name, true)
+                  } catch (error) {
+                    console.error('Error retrying generation:', error)
+                  }
+                }}
+                variant="outline" 
+                size="sm" 
+                className="mt-2"
+                disabled={section.isGenerating}
+              >
+                {section.isGenerating ? (
+                  <>
+                    <Loader2 className="h-3 w-3 animate-spin mr-1" />
+                    Generating...
+                  </>
+                ) : (
+                  <>
+                    <RefreshCw className="h-3 w-3 mr-1" />
+                    Retry Generation
+                  </>
+                )}
+              </Button>
+            </div>
+          )}
+
+          {/* AI Generated Content */}
+          {section.questions.length > 0 && (() => {
+            const isDriverSection = ['performance', 'price', 'reputation'].some(type => 
+              section.name.toLowerCase().includes(type)
+            )
+            
+            return (
+              <div>
+                <h4 className="font-semibold text-gray-900 mb-3 flex items-center">
+                  <Sparkles className="h-4 w-4 mr-2 text-blue-500" />
+                  {isDriverSection 
+                    ? `${section.name} Drivers (${section.questions.length})`
+                    : `AI Generated (${section.questions.length})`
+                  }
+                </h4>
+                <div className="space-y-2">
+                  {section.questions.map((question, qIndex) => (
+                    <GeneratedQuestionCard
+                      key={question.id}
+                      question={question}
+                      qIndex={qIndex}
+                      isDriverSection={isDriverSection}
+                      sectionName={section.name}
+                      editingQuestion={editingQuestion}
+                      setEditingQuestion={setEditingQuestion}
+                      editedText={editedText}
+                      setEditedText={setEditedText}
+                      rewriteExpanded={rewriteExpanded}
+                      setRewriteExpanded={setRewriteExpanded}
+                      rewriteFeedback={rewriteFeedback}
+                      setRewriteFeedback={setRewriteFeedback}
+                      onSaveEdit={() => handleSaveEdit(question.id)}
+                      onDelete={() => handleDeleteQuestion(question.id)}
+                      onRewrite={(feedbackText) => handleRewriteWithFeedback(question.id, feedbackText)}
+                      isSubmittingFeedback={isSubmittingFeedback === question.id}
+                      editedQuestions={editedQuestions}
+                      rewrittenQuestions={rewrittenQuestions}
+                    />
+                  ))}
+                </div>
+              </div>
+            )
+          })()}
+
+          {/* No Content Generated Yet */}
+          {section.questions.length === 0 && !section.isGenerating && !section.generationError && section.section_type !== 'static' && (
+            <div className="text-center py-8 text-gray-500">
+              <Sparkles className="h-8 w-8 mx-auto mb-2 opacity-50" />
+              <p className="mb-4">
+                {['performance', 'price', 'reputation'].some(type => section.name.toLowerCase().includes(type))
+                  ? `No ${section.name.includes('Performance') ? 'performance drivers' : section.name.includes('Price') ? 'price drivers' : section.name.includes('Reputation') ? 'reputation drivers' : 'drivers'} generated yet for this section.`
+                  : 'No questions generated yet for this section.'
+                }
+              </p>
+              <Button 
+                onClick={async () => {
+                  try {
+                    await generateQuestionsForSection(section.id, section.name, true)
+                  } catch (error) {
+                    console.error('Error generating questions for section:', error)
+                  }
+                }}
+                variant="outline" 
+                size="sm"
+                disabled={section.isGenerating}
+              >
+                {section.isGenerating ? (
+                  <>
+                    <Loader2 className="h-3 w-3 animate-spin mr-1" />
+                    Generating...
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="h-3 w-3 mr-1" />
+                    Generate {['performance', 'price', 'reputation'].some(type => section.name.toLowerCase().includes(type)) ? 'Drivers' : 'Questions'} for This Section
+                  </>
+                )}
+              </Button>
+            </div>
+          )}
+        </CardContent>
+      )}
+    </Card>
+  )
+}
 
 export default function QuestionReviewPage() {
   const params = useParams()
   const router = useRouter()
+  const searchParams = useSearchParams()
   const { toast } = useToast()
+  
   const projectId = params.id as string
-
-  const [project, setProject] = useState<Project | null>(null)
+  const selectedSectionIds = useMemo(() => 
+    searchParams.get('selected_sections')?.split(',') || [], 
+    [searchParams]
+  )
+  
+  const [project, setProject] = useState<any>(null)
+  const [sections, setSections] = useState<ProcessedSection[]>([])
   const [isLoading, setIsLoading] = useState(true)
-  const [sections, setSections] = useState<SurveySection[]>(mockSections)
+  const [isSubmittingFeedback, setIsSubmittingFeedback] = useState<string>("")
+  const [feedbackText, setFeedbackText] = useState<Record<string, string>>({})
+  const [selectedRepromptOption, setSelectedRepromptOption] = useState<string>("")
+  const [repromptOptions, setRepromptOptions] = useState<QuestionRepromptOption[]>([])
+  const [isGeneratingAll, setIsGeneratingAll] = useState(false)
+  const [editingSection, setEditingSection] = useState<string | null>(null)
+  
+  // New streamlined states for generated question cards
   const [editingQuestion, setEditingQuestion] = useState<string | null>(null)
-  const [isGeneratingAI, setIsGeneratingAI] = useState<string | null>(null)
-  const [feedbackText, setFeedbackText] = useState<string>("")
-  const [isSubmittingFeedback, setIsSubmittingFeedback] = useState<string | null>(null)
-  const [manualEditMode, setManualEditMode] = useState<string | null>(null)
+  const [editedText, setEditedText] = useState<string>("")
+  const [rewriteExpanded, setRewriteExpanded] = useState<string | null>(null)
+  const [rewriteFeedback, setRewriteFeedback] = useState<Record<string, string>>({})
+  const [editedQuestions, setEditedQuestions] = useState<string[]>([])
+  const [rewrittenQuestions, setRewrittenQuestions] = useState<string[]>([])
 
-  // Fetch project data
-  const fetchProject = useCallback(async () => {
-    setIsLoading(true)
+  // Drag and drop sensors
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  )
+
+  // Handle drag end
+  const handleDragEnd = useCallback((event: DragEndEvent) => {
+    const { active, over } = event
+
+    if (over && active.id !== over.id) {
+      setSections((items) => {
+        const oldIndex = items.findIndex((item) => item.id === active.id)
+        const newIndex = items.findIndex((item) => item.id === over.id)
+
+        return arrayMove(items, oldIndex, newIndex)
+      })
+    }
+  }, [])
+
+  // Generate questions for a specific section using OpenAI
+  const generateQuestionsForSection = useCallback(async (sectionId: string, sectionName: string, refreshAfter: boolean = false): Promise<GeneratedQuestion[]> => {
     try {
-      const fetchedProject = await getProjectById(projectId)
-      if (fetchedProject) {
-        setProject(fetchedProject)
-      } else {
-        toast({ title: "Error", description: "Project not found.", variant: "destructive" })
-        router.push("/projects") // Redirect if project not found
+      console.log(`🤖 Generating questions for section: ${sectionName} (${sectionId})`)
+      
+      const questionsBySection = await generateAIQuestions({
+        project_id: projectId,
+        sections: [sectionId],
+        max_questions_per_section: 10
+      })
+      
+      const questions = questionsBySection[sectionId] || []
+      console.log(`✅ Generated ${questions.length} questions for ${sectionName}`)
+      
+      // If refreshAfter is true, refresh the section data from backend
+      if (refreshAfter && questions.length > 0) {
+        console.log('🔄 Refreshing section data from backend after individual generation...')
+        const refreshedSections = await getProjectSectionsDetailed(projectId)
+        
+        // Filter to only selected sections, or use all sections if none specifically selected
+        const selectedSections = selectedSectionIds.length > 0 
+          ? refreshedSections.filter(section => selectedSectionIds.includes(section.id))
+          : refreshedSections
+        
+        // Process sections - now with fresh data from backend
+        const processedSections = selectedSections.map(section => ({
+          ...section,
+          questions: section.questions || [],
+          isGenerating: false,
+          isExpanded: true
+        }))
+        
+        setSections(processedSections)
+        console.log('✅ Refreshed section data from backend after individual generation')
       }
+      
+      return questions
     } catch (error) {
-      console.error("Failed to fetch project:", error)
-      toast({ title: "Error", description: "Could not load project details.", variant: "destructive" })
+      console.error(`❌ Error generating questions for ${sectionName}:`, error)
+      throw error
+    }
+  }, [projectId, selectedSectionIds])
+
+  // Generate questions for all sections
+  const generateAllQuestions = useCallback(async () => {
+    if (!sections.length) return
+    
+    setIsGeneratingAll(true)
+    
+    try {
+      const updatedSections = [...sections]
+      let hasGeneratedNewQuestions = false
+      
+      // Generate questions for each section that doesn't have them yet
+      for (let i = 0; i < updatedSections.length; i++) {
+        const section = updatedSections[i]
+        
+        // Skip if already has questions or is static-only
+        if (section.questions.length > 0 || section.section_type === 'static') {
+          continue
+        }
+        
+        // Mark as generating
+        updatedSections[i] = { ...section, isGenerating: true, generationError: undefined }
+        setSections([...updatedSections])
+        
+        try {
+          const questions = await generateQuestionsForSection(section.id, section.name)
+          updatedSections[i] = { 
+            ...updatedSections[i], 
+            questions, 
+            isGenerating: false,
+            generationError: undefined
+          }
+          hasGeneratedNewQuestions = true
+        } catch (error) {
+          updatedSections[i] = { 
+            ...updatedSections[i], 
+            isGenerating: false,
+            generationError: `Failed to generate questions: ${error instanceof Error ? error.message : 'Unknown error'}`
+          }
+        }
+        
+        setSections([...updatedSections])
+      }
+      
+      // Refresh data from backend to get the actual saved questions with correct IDs
+      if (hasGeneratedNewQuestions) {
+        console.log('🔄 Refreshing sections data from backend to get saved questions...')
+        const refreshedSections = await getProjectSectionsDetailed(projectId)
+        
+        // Filter to only selected sections, or use all sections if none specifically selected
+        const selectedSections = selectedSectionIds.length > 0 
+          ? refreshedSections.filter(section => selectedSectionIds.includes(section.id))
+          : refreshedSections
+        
+        // Process sections - now with fresh data from backend
+        const processedSections = selectedSections.map(section => ({
+          ...section,
+          questions: section.questions || [],
+          isGenerating: false,
+          isExpanded: true
+        }))
+        
+        setSections(processedSections)
+        console.log('✅ Refreshed sections data from backend')
+      }
+      
+      toast({ title: "Success", description: "Question generation completed!" })
+    } catch (error) {
+      console.error('Error in generateAllQuestions:', error)
+      toast({ title: "Error", description: "Failed to generate questions.", variant: "destructive" })
+    } finally {
+      setIsGeneratingAll(false)
+    }
+  }, [sections, generateQuestionsForSection, toast, projectId, selectedSectionIds])
+
+  // Process static content for display
+  const processStaticContent = useCallback((staticContent: any): string => {
+    if (!staticContent) {
+      return ''
+    }
+    
+    if (typeof staticContent === 'string') {
+      return staticContent
+    }
+    
+    if (Array.isArray(staticContent)) {
+      let content = ''
+      staticContent.forEach((sub: any) => {
+        if (sub.name) {
+          content += `${sub.name}\n`
+        }
+        if (sub.description) {
+          content += `${sub.description}\n`
+        }
+        if (sub.questions && sub.questions.length > 0) {
+          content += `${sub.questions.length} questions\n`
+        }
+        content += '\n'
+      })
+      return content
+    }
+    
+    if (staticContent.type === 'composite' && staticContent.subsections) {
+      let content = staticContent.title ? `${staticContent.title}\n\n` : ''
+      content += staticContent.subsections.map((sub: any) => 
+        `${sub.title}\n${sub.content || sub.description || ''}`
+      ).join('\n\n')
+      return content
+    }
+    
+    if (staticContent.content) {
+      return staticContent.content
+    }
+    
+    return JSON.stringify(staticContent, null, 2)
+  }, [])
+
+  // Save all questions
+  const saveAllQuestions = useCallback(async () => {
+    try {
+      const questionsData = sections.map(section => ({
+        id: section.id,
+        custom_title: section.name,
+        questions: section.questions.map(q => ({
+          id: q.id,
+          question_text: q.text,
+          question_type: q.type,
+          position: q.position,
+          is_required: q.is_required || false,
+          options: q.options || []
+        }))
+      }))
+      
+      await saveProjectQuestions(projectId, questionsData)
+      toast({ title: "Success", description: "All questions saved successfully!" })
+    } catch (error) {
+      console.error('Save error:', error)
+      toast({ title: "Error", description: "Failed to save questions.", variant: "destructive" })
+      throw error // Re-throw to prevent export if save fails
+    }
+  }, [projectId, sections, toast])
+
+  // Export project as DOCX
+  const exportSurvey = useCallback(async () => {
+    try {
+      setIsLoading(true)
+      
+      // First save all questions if needed
+      await saveAllQuestions()
+      
+      // Then export as DOCX using the API function
+      const blob = await apiExportProject(projectId, 'docx')
+      
+      // Create filename and download
+      const filename = `survey_export_${projectId.slice(0, 8)}.docx`
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.style.display = 'none'
+      a.href = url
+      a.download = filename
+      document.body.appendChild(a)
+      a.click()
+      window.URL.revokeObjectURL(url)
+      document.body.removeChild(a)
+      
+      toast({ title: "Success", description: "Survey exported successfully!" })
+    } catch (error) {
+      console.error('Export error:', error)
+      toast({ title: "Error", description: "Failed to export survey.", variant: "destructive" })
     } finally {
       setIsLoading(false)
     }
-  }, [projectId, router, toast])
+  }, [projectId, saveAllQuestions, toast])
 
-  useEffect(() => {
-    if (projectId) {
-      fetchProject()
+  // Streamlined handlers for generated question cards
+  const handleSaveEdit = useCallback(async (questionId: string) => {
+    try {
+      // Update the local state
+      setSections(prev => prev.map(section => ({
+        ...section,
+        questions: section.questions.map(q => 
+          q.id === questionId ? { ...q, text: editedText } : q
+        )
+      })))
+      
+      // Mark question as edited
+      setEditedQuestions(prev => prev.includes(questionId) ? prev : [...prev, questionId])
+      
+      setEditingQuestion(null)
+      setEditedText("")
+      
+      // Save the updated questions to backend
+      await saveAllQuestions()
+      toast({ title: "Success", description: "Question updated and saved!" })
+    } catch (error) {
+      toast({ title: "Error", description: "Failed to update question.", variant: "destructive" })
     }
-  }, [projectId, fetchProject])
+  }, [editedText, toast, saveAllQuestions])
 
-  // Toggle section expansion
-  const toggleSection = (sectionId: string) => {
-    setSections((prev) =>
-      prev.map((section) => (section.id === sectionId ? { ...section, isExpanded: !section.isExpanded } : section)),
-    )
-  }
-
-  // Update question text
-  const updateQuestionText = (questionId: string, newText: string) => {
-    setSections((prev) =>
-      prev.map((section) => ({
+  const handleDeleteQuestion = useCallback(async (questionId: string) => {
+    try {
+      // Here you would call an API to delete the question
+      // For now, just update the local state
+      setSections(prev => prev.map(section => ({
         ...section,
-        questions: section.questions.map((question) =>
-          question.id === questionId ? { ...question, text: newText } : question,
-        ),
-      })),
-    )
-  }
+        questions: section.questions.filter(q => q.id !== questionId)
+      })))
+      
+      toast({ title: "Success", description: "Question deleted successfully!" })
+    } catch (error) {
+      toast({ title: "Error", description: "Failed to delete question.", variant: "destructive" })
+    }
+  }, [toast])
 
-  // Apply AI suggestion
-  const applyAISuggestion = (questionId: string, suggestion: string) => {
-    updateQuestionText(questionId, suggestion)
-    setEditingQuestion(null)
-    toast({ title: "Applied", description: "AI suggestion has been applied to the question." })
-  }
+  const handleRewriteWithFeedback = useCallback(async (questionId: string, feedbackText?: string) => {
+    try {
+      setIsSubmittingFeedback(questionId)
+      
+      // Find the current question and its section
+      let currentQuestion: GeneratedQuestion | undefined
+      let currentSection: ProcessedSection | undefined
+      
+      for (const section of sections) {
+        const question = section.questions.find(q => q.id === questionId)
+        if (question) {
+          currentQuestion = question
+          currentSection = section
+          break
+        }
+      }
+      
+      if (!currentQuestion || !currentSection) {
+        console.error('Question or section not found')
+        setIsSubmittingFeedback("")
+        return
+      }
+      
+      // Use provided feedback or fall back to stored feedback
+      const feedback = feedbackText || rewriteFeedback[questionId] || ""
+      
+      if (!feedback.trim()) {
+        toast({ title: "Error", description: "Please provide feedback before rewriting.", variant: "destructive" })
+        setIsSubmittingFeedback("")
+        return
+      }
+      
+      // Use the reprompt API with 'custom' option and feedback
+      const repromptResult = await repromptQuestions({
+        original_questions: [currentQuestion],
+        reprompt_option: 'custom',
+        section_id: currentSection.id,
+        project_id: projectId,
+        custom_feedback: feedback
+      })
+      
+      if (repromptResult && repromptResult.length > 0) {
+        const newQuestion = repromptResult[0]
+        
+        // Update the specific question in sections
+        setSections(prev => prev.map(section => ({
+          ...section,
+          questions: section.questions.map(q => 
+            q.id === questionId 
+              ? { ...currentQuestion!, text: newQuestion.text, type: newQuestion.type, options: newQuestion.options }
+              : q
+          )
+        })))
+        
+        // Mark question as rewritten and close rewrite section
+        setRewrittenQuestions(prev => prev.includes(questionId) ? prev : [...prev, questionId])
+        setRewriteExpanded(null)
+        setRewriteFeedback(prev => ({ ...prev, [questionId]: "" }))
+        
+        // Save the updated questions to backend
+        await saveAllQuestions()
+        toast({ title: "Success", description: "Question rewritten and saved!" })
+      } else {
+        throw new Error('No rewritten question received')
+      }
+      
+    } catch (error) {
+      console.error('Error rewriting question:', error)
+      toast({ title: "Error", description: "Failed to rewrite question. Please try again.", variant: "destructive" })
+    } finally {
+      setIsSubmittingFeedback("")
+    }
+  }, [sections, rewriteFeedback, toast, projectId, saveAllQuestions])
 
-  // Generate new AI suggestions
-  const generateAISuggestions = async (questionId: string) => {
-    setIsGeneratingAI(questionId)
-    // Simulate AI generation
-    await new Promise((resolve) => setTimeout(resolve, 2000))
+  // Load data on component mount
+  useEffect(() => {
+    const loadProjectData = async () => {
+      try {
+        setIsLoading(true)
+        
+        // Fetch project details
+        const projectData = await getProjectById(projectId)
+        if (!projectData) {
+          toast({ title: "Error", description: "Project not found.", variant: "destructive" })
+          return
+        }
+        setProject(projectData)
+        
+        // Fetch all project sections (already detailed)
+        const allSections = await getProjectSectionsDetailed(projectId)
+        
+        // Filter to only selected sections, or use all sections if none specifically selected
+        const selectedSections = selectedSectionIds.length > 0 
+          ? allSections.filter(section => selectedSectionIds.includes(section.id))
+          : allSections
+        
+        if (selectedSections.length === 0) {
+          toast({ title: "Warning", description: "No sections found.", variant: "destructive" })
+          return
+        }
+        
+        // Process sections - keep existing questions from the backend
+        const processedSections = selectedSections.map(section => ({
+          ...section,
+          questions: section.questions || [], // Keep existing questions from backend
+          isGenerating: false,
+          isExpanded: true
+        }))
+        
+        // Sort sections: Core sections first, then Prophecy sections
+        const sortedSections = processedSections.sort((a, b) => {
+          // Determine section types based on is_core flag or section properties
+          const aIsCore = a.is_core !== undefined ? a.is_core : 
+            (a.section_type === 'core' || !a.name?.toLowerCase().includes('prophecy'))
+          const bIsCore = b.is_core !== undefined ? b.is_core : 
+            (b.section_type === 'core' || !b.name?.toLowerCase().includes('prophecy'))
+          
+          // Core sections come first
+          if (aIsCore && !bIsCore) return -1
+          if (!aIsCore && bIsCore) return 1
+          
+          // Within same type, maintain original order
+          return 0
+        })
+        
+        setSections(sortedSections)
+        
+        // Fetch reprompt options
+        const options = await getQuestionRepromptOptions()
+        setRepromptOptions(options)
+        setSelectedRepromptOption(options[0]?.id || '')
+        
+      } catch (error) {
+        console.error('Error fetching project:', error)
+        toast({ title: "Error", description: "Failed to load project data.", variant: "destructive" })
+      } finally {
+        setIsLoading(false)
+      }
+    }
 
-    const newSuggestions = [
-      "How would you rate your experience with our product?",
-      "What is your overall satisfaction level?",
-      "Please evaluate your experience using the scale below:",
-    ]
-
-    setSections((prev) =>
-      prev.map((section) => ({
-        ...section,
-        questions: section.questions.map((question) =>
-          question.id === questionId ? { ...question, aiSuggestions: newSuggestions } : question,
-        ),
-      })),
-    )
-
-    setIsGeneratingAI(null)
-    toast({ title: "Generated", description: "New AI suggestions have been generated." })
-  }
+    loadProjectData()
+  }, [projectId, selectedSectionIds])
 
   // Submit feedback and regenerate with context
   const submitFeedbackAndRegenerate = async (questionId: string, feedback: string) => {
+    if (!feedback.trim()) {
+      toast({ title: "Error", description: "Please provide feedback before submitting.", variant: "destructive" })
+      return
+    }
+
     setIsSubmittingFeedback(questionId)
-    // Simulate AI regeneration with feedback
-    await new Promise((resolve) => setTimeout(resolve, 2000))
+    try {
+      // Find the question
+      const section = sections.find(s => s.questions.some(q => q.id === questionId))
+      const question = section?.questions.find(q => q.id === questionId)
+      
+      if (!question) {
+        throw new Error("Question not found")
+      }
 
-    const contextualSuggestions = [
-      `Based on your feedback: "${feedback}" - How would you rate your experience with our product?`,
-      `Incorporating your input: "${feedback}" - What is your overall satisfaction level?`,
-      `Considering your feedback: "${feedback}" - Please evaluate your experience using the scale below:`,
-    ]
+      const response = await repromptQuestions({
+        original_questions: [{
+          id: question.id,
+          text: question.text,
+          type: question.type,
+          options: question.options
+        }],
+        reprompt_option: selectedRepromptOption,
+        section_id: section?.id || '',
+        project_id: projectId
+      })
 
-    setSections((prev) =>
-      prev.map((section) => ({
-        ...section,
-        questions: section.questions.map((question) =>
-          question.id === questionId ? { ...question, aiSuggestions: contextualSuggestions } : question,
-        ),
-      })),
-    )
-
-    setIsSubmittingFeedback(null)
-    setFeedbackText("")
-    toast({ title: "Regenerated", description: "New suggestions generated based on your feedback." })
+      if (response && response.length > 0) {
+        // Update the question in the sections
+        setSections(prevSections => 
+          prevSections.map(s => 
+            s.id === section?.id ? {
+              ...s,
+              questions: s.questions.map(q => 
+                q.id === questionId ? response[0] : q
+              )
+            } : s
+          )
+        )
+        
+        // Clear feedback
+        setFeedbackText(prev => ({ ...prev, [questionId]: '' }))
+        
+        toast({ title: "Success", description: "Question regenerated successfully!" })
+      }
+    } catch (error) {
+      console.error('Error regenerating question:', error)
+      toast({ title: "Error", description: "Failed to regenerate question.", variant: "destructive" })
+    } finally {
+      setIsSubmittingFeedback("")
+    }
   }
 
-  // Toggle manual edit mode
-  const toggleManualEditMode = (questionId: string) => {
-    if (manualEditMode === questionId) {
-      setManualEditMode(null)
+  // Save all questions and proceed
+  const handleSaveAndProceed = async () => {
+    try {
+      // Prepare sections data for saving
+      const sectionsData = sections.map(section => ({
+        id: section.id,
+        custom_title: section.name,
+        questions: section.questions.map((q, index) => ({
+          id: q.id,
+          question_text: q.text,
+          question_type: q.type,
+          position: index + 1,
+          is_required: q.is_required,
+                     answer_options: q.options?.map((opt, optIndex) => ({
+             option_text: opt,
+             position: optIndex + 1
+           })) || []
+        }))
+      }))
+
+      await saveProjectQuestions(projectId, sectionsData)
+      await updateProjectStatus(projectId, 'questions_complete')
+      
+      toast({ title: "Success", description: "Questions saved successfully!" })
+      router.push(`/projects/${projectId}/review`)
+    } catch (error) {
+      console.error('Error saving questions:', error)
+      toast({ title: "Error", description: "Failed to save questions.", variant: "destructive" })
+    }
+  }
+
+  // Toggle section expansion
+  const toggleSection = (sectionId: string) => {
+    setSections(prev => prev.map(section => 
+      section.id === sectionId 
+        ? { ...section, isExpanded: !section.isExpanded }
+        : section
+    ))
+  }
+
+  // Render static content
+  const renderStaticContent = useCallback((contentData: any) => {
+    if (!contentData) {
+      console.log('⚠️ No static content data provided')
+      return null
+    }
+    
+    // Debug: Log the content structure
+    console.log('🔍 Static content structure:', contentData)
+    
+    if (editingSection && typeof contentData === 'string') {
+      return (
+        <Textarea
+          value={contentData}
+          onChange={(e) => setSections(prev => prev.map(s => 
+            s.id === editingSection ? { ...s, static_content: e.target.value } : s
+          ))}
+          className="w-full"
+        />
+      )
+    }
+    
+    // Extract the actual content string from the object
+    let contentString = ''
+    if (typeof contentData === 'object' && contentData.content) {
+      contentString = contentData.content
+    } else if (typeof contentData === 'string') {
+      contentString = contentData
     } else {
-      setManualEditMode(questionId)
-      setEditingQuestion(questionId) // Ensure editing question is also set
+      // Fallback for unknown structure
+      return (
+        <pre className="whitespace-pre-wrap text-sm text-gray-700 font-sans">
+          {JSON.stringify(contentData, null, 2)}
+        </pre>
+      )
     }
-  }
-
-  // Reset all editing states
-  const resetEditingStates = () => {
-    setEditingQuestion(null)
-    setManualEditMode(null)
-    setFeedbackText("")
-    setIsGeneratingAI(null)
-    setIsSubmittingFeedback(null)
-  }
-
-  // Duplicate question
-  const duplicateQuestion = (questionId: string) => {
-    setSections((prev) =>
-      prev.map((section) => {
-        const questionIndex = section.questions.findIndex((q) => q.id === questionId)
-        if (questionIndex !== -1) {
-          const originalQuestion = section.questions[questionIndex]
-          const newQuestion: Question = {
-            ...originalQuestion,
-            id: `${originalQuestion.id}-copy`,
-            questionNumber: `${originalQuestion.questionNumber}a`,
-            text: `${originalQuestion.text} (Copy)`,
-            options: originalQuestion.options?.map((opt) => ({
-              ...opt,
-              id: `${opt.id}-copy`,
-            })),
+    
+    // Handle structured content from API
+    if (contentData.content && Array.isArray(contentData.content)) {
+      return (
+        <div className="space-y-3">
+          {contentData.content.map((item: any, index: number) => {
+            switch (item.type) {
+              case 'heading':
+                return <h3 key={index} className="text-lg font-semibold text-gray-900">{item.text}</h3>
+              case 'paragraph':
+                return <p key={index} className="text-sm text-gray-700">{item.text}</p>
+              case 'list':
+                return (
+                  <div key={index}>
+                    {item.style === 'numbered' ? (
+                      <ol className="list-decimal list-inside space-y-1 text-sm text-gray-700">
+                        {item.items.map((listItem: string, idx: number) => (
+                          <li key={idx}>{listItem}</li>
+                        ))}
+                      </ol>
+                    ) : (
+                      <ul className="list-disc list-inside space-y-1 text-sm text-gray-700">
+                        {item.items.map((listItem: string, idx: number) => (
+                          <li key={idx}>{listItem}</li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                )
+              case 'consent_checkbox':
+                return (
+                  <div key={index} className="flex items-center space-x-2 p-2 bg-blue-50 rounded">
+                    <input type="checkbox" className="rounded" />
+                    <span className="text-sm text-gray-700">{item.text}</span>
+                    {item.required && <span className="text-red-500">*</span>}
+                  </div>
+                )
+              default:
+                return <div key={index} className="text-sm text-gray-600">{JSON.stringify(item)}</div>
+            }
+          })}
+        </div>
+      )
+    }
+    
+    // Handle survey question format (Demographics section with questions like WORK, DEM2, etc.)
+    if (contentString && contentString.includes('\n')) {
+      console.log('🔍 Content has newlines, checking if it needs survey parsing...', contentString.substring(0, 100))
+      
+      // Only parse as survey format if it looks like survey content (has question codes)
+      const hasSurveyFormat = contentString.match(/^[A-Z0-9_]+$/m) && contentString.match(/^\d+$/m)
+      
+      if (!hasSurveyFormat) {
+        console.log('✅ Not survey format, using simple rendering')
+        // For simple text with newlines (like Introduction), just preserve formatting
+        return (
+          <div className="whitespace-pre-wrap text-sm text-gray-700 font-sans">
+            {contentString}
+          </div>
+        )
+      }
+      
+      console.log('🔧 Parsing as survey format...')
+      // Parse survey format content
+      const lines = contentString.split('\n')
+      const elements: JSX.Element[] = []
+      let currentQuestion: {
+        code?: string
+        text?: string
+        options?: string[]
+        meta?: string
+      } | null = null
+      
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i].trim()
+        
+        if (!line) continue // Skip empty lines
+        
+        // Check if this is a question code (e.g., "WORK", "DEM2", "HH")
+        if (line.match(/^[A-Z0-9_]+$/) && i + 1 < lines.length && lines[i + 1].match(/^\d+$/)) {
+          // Save previous question if exists
+          if (currentQuestion && currentQuestion.text) {
+            elements.push(
+              <div key={`q-${currentQuestion.code}`} className="mb-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                <div className="flex items-start justify-between mb-2">
+                  <span className="text-xs font-semibold text-blue-600">{currentQuestion.code}</span>
+                  {currentQuestion.meta && (
+                    <span className="text-xs text-gray-500">{currentQuestion.meta}</span>
+                  )}
+                </div>
+                <p className="font-medium text-gray-900 mb-3">{currentQuestion.text}</p>
+                {currentQuestion.options && currentQuestion.options.length > 0 && (
+                  <div className="space-y-1">
+                    {currentQuestion.options.map((opt, idx) => (
+                      <div key={idx} className="flex items-start">
+                        <span className="text-sm text-gray-600">{opt}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )
           }
-          const newQuestions = [...section.questions]
-          newQuestions.splice(questionIndex + 1, 0, newQuestion)
-          return { ...section, questions: newQuestions }
+          
+          // Start new question
+          currentQuestion = {
+            code: line,
+            options: []
+          }
+          i++ // Skip the number on next line
         }
-        return section
-      }),
-    )
-    toast({ title: "Duplicated", description: "Question has been duplicated." })
-  }
-
-  // Delete question
-  const deleteQuestion = (questionId: string) => {
-    setSections((prev) =>
-      prev.map((section) => ({
-        ...section,
-        questions: section.questions.filter((question) => question.id !== questionId),
-      })),
-    )
-    toast({ title: "Deleted", description: "Question has been removed." })
-  }
-
-  // Add new question to section
-  const addNewQuestion = (sectionId: string) => {
-    const section = sections.find((s) => s.id === sectionId)
-    if (!section) return
-
-    const newQuestionNumber = `Q${section.questions.length + 1}`
-    const newQuestion: Question = {
-      id: `${sectionId}-new-${Date.now()}`,
-      sectionId,
-      questionNumber: newQuestionNumber,
-      text: "Enter your question here...",
-      type: "single-choice",
-      options: [
-        { id: `new-opt1-${Date.now()}`, text: "Option 1", order: 1 },
-        { id: `new-opt2-${Date.now()}`, text: "Option 2", order: 2 },
-      ],
-      isRequired: true,
-      isAiGenerated: false,
-      order: section.questions.length + 1,
+        // Check for question metadata (e.g., "ASK IF WORK = 1 OR 2")
+        else if (line.startsWith('ASK IF') || line.match(/^(SR|MR|DNR)/)) {
+          if (currentQuestion) {
+            currentQuestion.meta = line
+          }
+        }
+        // Check if line is an option (starts with number)
+        else if (line.match(/^\d+\s+/) && currentQuestion) {
+          currentQuestion.options?.push(line)
+        }
+        // Check for section headers (all caps)
+        else if (line === line.toUpperCase() && line.length > 3 && !line.match(/^\d/)) {
+          elements.push(
+            <h4 key={`header-${i}`} className="text-sm font-bold text-gray-800 uppercase tracking-wide mt-6 mb-3">
+              {line}
+            </h4>
+          )
+        }
+        // Otherwise it's likely question text
+        else if (currentQuestion && !currentQuestion.text && line.length > 10) {
+          currentQuestion.text = line
+        }
+        // Handle option groups
+        else if (line && currentQuestion && currentQuestion.options) {
+          // Could be a category header for options
+          if (!line.match(/^\d/) && lines[i + 1]?.match(/^\d+\s+/)) {
+            currentQuestion.options.push(`\n${line}`) // Add as header
+          } else {
+            currentQuestion.options.push(line)
+          }
+        }
+      }
+      
+      // Don't forget the last question
+      if (currentQuestion && currentQuestion.text) {
+        elements.push(
+          <div key={`q-${currentQuestion.code}`} className="mb-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
+            <div className="flex items-start justify-between mb-2">
+              <span className="text-xs font-semibold text-blue-600">{currentQuestion.code}</span>
+              {currentQuestion.meta && (
+                <span className="text-xs text-gray-500">{currentQuestion.meta}</span>
+              )}
+            </div>
+            <p className="font-medium text-gray-900 mb-3">{currentQuestion.text}</p>
+            {currentQuestion.options && currentQuestion.options.length > 0 && (
+              <div className="space-y-1">
+                {currentQuestion.options.map((opt, idx) => (
+                  <div key={idx} className="flex items-start">
+                    <span className="text-sm text-gray-600">{opt}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )
+      }
+      
+      return <div className="space-y-4">{elements}</div>
     }
-
-    setSections((prev) =>
-      prev.map((s) => (s.id === sectionId ? { ...s, questions: [...s.questions, newQuestion] } : s)),
+    
+    // Fallback for simple string content
+    return (
+      <pre className="whitespace-pre-wrap text-sm text-gray-700 font-sans">
+        {contentString || JSON.stringify(contentData, null, 2)}
+      </pre>
     )
+  }, [editingSection])
 
-    setEditingQuestion(newQuestion.id)
-    toast({ title: "Added", description: "New question has been added to the section." })
-  }
-
-  // Handle continue to next step
-  const handleContinue = async () => {
-    // In a real app, you would save the questions to the project
-    console.log("Questions saved:", sections)
-    return true
-  }
+  // Open rewrite modal
+  const openRewriteModal = useCallback((sectionId: string) => {
+    setEditingSection(sectionId)
+  }, [])
 
   if (isLoading) {
     return (
-      <>
-        <Header title="Loading..." />
-        <div className="flex justify-center items-center h-[calc(100vh-10rem)]">
-          <Loader2Icon className="h-12 w-12 animate-spin text-primary" />
-          <p className="ml-4 text-muted-foreground">Loading project details...</p>
+      <div className="min-h-screen bg-gray-50">
+        <Header />
+        <WorkflowNavigation currentStep="questions" projectId={projectId} />
+        <div className="container mx-auto px-4 py-8">
+          <div className="flex items-center justify-center min-h-[400px]">
+            <div className="text-center">
+              <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
+              <p className="text-gray-600">Loading sections and questions...</p>
+            </div>
+          </div>
         </div>
-      </>
-    )
-  }
-
-  if (!project) {
-    return (
-      <>
-        <Header title="Project Not Found" />
-        <div className="container mx-auto py-8 text-center">
-          <p className="text-xl text-muted-foreground">Project not found.</p>
-          <Button asChild className="mt-4">
-            <Link href="/projects">
-              <ArrowLeftIcon className="mr-2 h-4 w-4" /> Back to Dashboard
-            </Link>
-          </Button>
-        </div>
-      </>
+      </div>
     )
   }
 
   return (
-    <>
-      <Header pageTitle="Question Review" stepNumber={3} />
-      <main className="container max-w-screen-xl mx-auto py-8 px-4 md:px-6 pb-24">
-        {/* Page Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold tracking-tight mb-4">Question Review</h1>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            Review and customize AI-generated questions for your survey sections. Edit questions, modify options, and
-            ensure they align with your research objectives.
+    <div className="min-h-screen bg-gray-50">
+      <Header />
+      <WorkflowNavigation currentStep="questions" projectId={projectId} />
+      
+      <div className="container mx-auto px-4 py-8">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Review Questions</h1>
+          <p className="text-gray-600">
+            Review the generated questions and static content for your survey. You can provide feedback to regenerate specific questions.
           </p>
         </div>
 
-        {/* Sections and Questions */}
-        <div className="space-y-6 mb-12">
-          {sections.map((section) => (
-            <Card key={section.id} className="overflow-hidden">
-              <CardHeader
-                className="cursor-pointer hover:bg-muted/50 transition-colors"
-                onClick={() => toggleSection(section.id)}
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
-                    <div className="flex items-center">
-                      {section.isExpanded ? (
-                        <ChevronUpIcon className="h-5 w-5 text-muted-foreground" />
-                      ) : (
-                        <ChevronDownIcon className="h-5 w-5 text-muted-foreground" />
-                      )}
-                    </div>
-                    <div>
-                      <CardTitle className="text-xl">{section.name}</CardTitle>
-                      <CardDescription>{section.description}</CardDescription>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Badge
-                      variant="outline"
-                      className={
-                        section.type === "basic"
-                          ? "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300"
-                          : "bg-amber-100 text-amber-700 dark:bg-amber-900 dark:text-amber-300"
-                      }
-                    >
-                      {section.type === "basic"
-                        ? "Basic"
-                        : section.type === "prophecy"
-                          ? "Prophecy"
-                          : section.type === "cx"
-                            ? "CX"
-                            : "Choice"}
-                    </Badge>
-                    <Badge variant="secondary">{section.questions.length} questions</Badge>
-                  </div>
-                </div>
-              </CardHeader>
 
-              {section.isExpanded && (
-                <CardContent className="pt-0">
-                  <div className="space-y-6">
-                    {section.questions.map((question) => (
-                      <div key={question.id} className="border rounded-lg p-6 bg-muted/20">
-                        {/* Question Header */}
-                        <div className="flex items-start justify-between mb-4">
-                          <div className="flex items-center space-x-3">
-                            <Badge variant="outline" className="font-mono">
-                              {question.questionNumber}
-                            </Badge>
-                            {question.isAiGenerated && (
-                              <Badge variant="outline" className="bg-purple-100 text-purple-700">
-                                <SparklesIcon className="h-3 w-3 mr-1" />
-                                AI Generated
-                              </Badge>
-                            )}
-                            {question.isRequired && (
-                              <Badge variant="outline" className="bg-red-100 text-red-700">
-                                Required
-                              </Badge>
-                            )}
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => setEditingQuestion(editingQuestion === question.id ? null : question.id)}
-                            >
-                              <EditIcon className="h-4 w-4" />
-                            </Button>
-                            <Button variant="ghost" size="sm" onClick={() => duplicateQuestion(question.id)}>
-                              <CopyIcon className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => deleteQuestion(question.id)}
-                              className="text-red-600 hover:text-red-700"
-                            >
-                              <TrashIcon className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </div>
+        {/* Sections */}
+        <DndContext 
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={handleDragEnd}
+        >
+          <SortableContext 
+            items={sections.map(s => s.id)}
+            strategy={verticalListSortingStrategy}
+          >
+            <div className="space-y-6">
+              {sections.map((section) => (
+                <SortableSection
+                  key={section.id}
+                  section={section}
+                  toggleSection={toggleSection}
+                  renderStaticContent={renderStaticContent}
+                  editingSection={editingSection}
+                  setEditingSection={setEditingSection}
+                  openRewriteModal={openRewriteModal}
+                  generateQuestionsForSection={generateQuestionsForSection}
+                  feedbackText={feedbackText}
+                  setFeedbackText={setFeedbackText}
+                  selectedRepromptOption={selectedRepromptOption}
+                  setSelectedRepromptOption={setSelectedRepromptOption}
+                  repromptOptions={repromptOptions}
+                  submitFeedbackAndRegenerate={submitFeedbackAndRegenerate}
+                  isSubmittingFeedback={isSubmittingFeedback}
+                  editingQuestion={editingQuestion}
+                  setEditingQuestion={setEditingQuestion}
+                  editedText={editedText}
+                  setEditedText={setEditedText}
+                  rewriteExpanded={rewriteExpanded}
+                  setRewriteExpanded={setRewriteExpanded}
+                  rewriteFeedback={rewriteFeedback}
+                  setRewriteFeedback={setRewriteFeedback}
+                  handleSaveEdit={handleSaveEdit}
+                  handleDeleteQuestion={handleDeleteQuestion}
+                  handleRewriteWithFeedback={handleRewriteWithFeedback}
+                  editedQuestions={editedQuestions}
+                  rewrittenQuestions={rewrittenQuestions}
+                />
+              ))}
+            </div>
+          </SortableContext>
+        </DndContext>
 
-                        {/* Question Text */}
-                        {editingQuestion === question.id ? (
-                          <div className="space-y-4">
-                            {manualEditMode === question.id ? (
-                              // Simple Manual Edit Mode
-                              <div className="space-y-4 p-4 border rounded-lg bg-muted/30">
-                                <div>
-                                  <Label>Manual Edit - Free Text</Label>
-                                  <p className="text-sm text-muted-foreground mb-2">
-                                    Edit the question freely. Our AI will help structure it when you save.
-                                  </p>
-                                  <Textarea
-                                    placeholder="Enter your question and any answer options here..."
-                                    rows={6}
-                                    className="mt-2"
-                                    defaultValue={
-                                      question.text +
-                                      (question.options
-                                        ? "\n\nOptions:\n" + question.options.map((opt) => `• ${opt.text}`).join("\n")
-                                        : "")
-                                    }
-                                  />
-                                </div>
-                                <div className="flex justify-end space-x-2">
-                                  <Button
-                                    variant="outline"
-                                    onClick={() => {
-                                      setManualEditMode(null)
-                                      setEditingQuestion(question.id) // Keep in editing mode but switch to AI suggestions
-                                    }}
-                                  >
-                                    Switch to AI Suggestions
-                                  </Button>
-                                  <Button
-                                    onClick={() => {
-                                      toast({ title: "Saved", description: "Manual edits have been applied." })
-                                      setManualEditMode(null)
-                                      setEditingQuestion(null)
-                                    }}
-                                  >
-                                    Apply Changes
-                                  </Button>
-                                </div>
-                              </div>
-                            ) : (
-                              // AI Suggestions Mode (make this more prominent)
-                              <div className="space-y-4">
-                                {/* Encouraging header for AI suggestions */}
-                                <div className="p-4 border rounded-lg bg-blue-50/50 border-blue-200">
-                                  <div className="flex items-center justify-between mb-2">
-                                    <Label className="flex items-center text-lg font-semibold">
-                                      <WandIcon className="h-5 w-5 mr-2 text-blue-600" />
-                                      AI Question Assistant
-                                    </Label>
-                                    <Button
-                                      variant="outline"
-                                      size="sm"
-                                      onClick={() => generateAISuggestions(question.id)}
-                                      disabled={isGeneratingAI === question.id}
-                                    >
-                                      {isGeneratingAI === question.id ? (
-                                        <Loader2Icon className="h-4 w-4 animate-spin mr-1" />
-                                      ) : (
-                                        <RefreshCwIcon className="h-4 w-4 mr-1" />
-                                      )}
-                                      More Suggestions
-                                    </Button>
-                                  </div>
-                                  <p className="text-sm text-blue-700 mb-3">
-                                    Our AI generates contextually relevant questions. Your feedback helps us improve for
-                                    everyone!
-                                  </p>
-
-                                  {question.aiSuggestions && (
-                                    <div className="space-y-2 mb-4">
-                                      <Label className="text-blue-900">Choose from AI suggestions:</Label>
-                                      {question.aiSuggestions.map((suggestion, index) => (
-                                        <div
-                                          key={index}
-                                          className="p-3 border border-blue-200 rounded-lg bg-white hover:bg-blue-50 cursor-pointer transition-colors"
-                                          onClick={() => applyAISuggestion(question.id, suggestion)}
-                                        >
-                                          <p className="text-sm">{suggestion}</p>
-                                        </div>
-                                      ))}
-                                    </div>
-                                  )}
-
-                                  {/* Enhanced Feedback Section */}
-                                  <div className="space-y-3 p-4 border border-blue-300 rounded-lg bg-blue-25">
-                                    <div className="flex items-center">
-                                      <span className="text-sm font-medium text-blue-900">
-                                        💡 Help us improve our AI
-                                      </span>
-                                    </div>
-                                    <Label className="text-blue-800">What would make this question better?</Label>
-                                    <Textarea
-                                      placeholder="e.g., 'Make it more conversational', 'Add industry-specific options', 'Focus on customer satisfaction'..."
-                                      value={feedbackText}
-                                      onChange={(e) => setFeedbackText(e.target.value)}
-                                      rows={3}
-                                      className="border-blue-200"
-                                    />
-                                    <Button
-                                      onClick={() => submitFeedbackAndRegenerate(question.id, feedbackText)}
-                                      disabled={!feedbackText.trim() || isSubmittingFeedback === question.id}
-                                      size="sm"
-                                      className="w-full"
-                                    >
-                                      {isSubmittingFeedback === question.id ? (
-                                        <Loader2Icon className="h-4 w-4 animate-spin mr-1" />
-                                      ) : (
-                                        <WandIcon className="h-4 w-4 mr-1" />
-                                      )}
-                                      Generate Better Suggestions
-                                    </Button>
-                                  </div>
-                                </div>
-
-                                {/* Manual edit as secondary option */}
-                                <div className="text-center">
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => toggleManualEditMode(question.id)}
-                                    className="text-muted-foreground"
-                                  >
-                                    Or edit manually
-                                  </Button>
-                                </div>
-                              </div>
-                            )}
-
-                            <div className="flex justify-end space-x-2">
-                              <Button variant="outline" onClick={resetEditingStates}>
-                                Cancel
-                              </Button>
-                              <Button onClick={resetEditingStates}>Save Changes</Button>
-                            </div>
-                          </div>
-                        ) : (
-                          <div>
-                            <p className="text-lg font-medium mb-3">{question.text}</p>
-                            {question.type !== "open-text" && question.options && (
-                              <div className="space-y-1">
-                                {question.options.map((option, index) => (
-                                  <div key={option.id} className="flex items-center space-x-2 text-sm">
-                                    <span className="text-muted-foreground">{index + 1}.</span>
-                                    <span>{option.text}</span>
-                                  </div>
-                                ))}
-                              </div>
-                            )}
-                            <div className="mt-3 flex items-center space-x-4 text-sm text-muted-foreground">
-                              <span>
-                                Type: {question.type.replace("-", " ").replace(/\b\w/g, (l) => l.toUpperCase())}
-                              </span>
-                              {question.options && <span>{question.options.length} options</span>}
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    ))}
-
-                    {/* Add New Question Button */}
-                    <Button
-                      variant="outline"
-                      className="w-full py-6 border-dashed"
-                      onClick={() => addNewQuestion(section.id)}
-                    >
-                      <PlusIcon className="h-5 w-5 mr-2" />
-                      Add New Question to {section.name}
-                    </Button>
-                  </div>
-                </CardContent>
-              )}
-            </Card>
-          ))}
-        </div>
-
-        {/* Consistent Navigation */}
-        <WorkflowNavigation projectId={projectId} currentStep="questions" onNext={handleContinue} />
-      </main>
-    </>
+      </div>
+    </div>
   )
 }

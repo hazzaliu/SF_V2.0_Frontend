@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation"
 import CreateProjectForm from "@/components/create-project-form"
 import Header from "@/components/header"
 import type { Methodology, Industry, Project } from "@/types"
-import { getMethodologies, getIndustries, createProject } from "@/lib/api"
+import { getMethodologies, getIndustries, createProject, uploadDesignBrief } from "@/lib/api"
 import { useToast } from "@/components/ui/use-toast"
 import { Loader2Icon } from "lucide-react"
 
@@ -45,14 +45,43 @@ export default function NewProjectPage() {
       | "estimated_duration"
       | "survey_sections"
     >,
+    designBriefFile?: File
   ) => {
     setIsSubmitting(true)
     try {
+      // Step 1: Create the project
       const newProject = await createProject(projectData)
-      toast({
-        title: "Success",
-        description: `Project "${newProject.project_name}" created successfully.`,
-      })
+      
+      // Step 2: Upload design brief if provided
+      if (designBriefFile) {
+        try {
+          const uploadResult = await uploadDesignBrief(newProject.id, designBriefFile)
+          if (uploadResult.success) {
+            toast({
+              title: "Success",
+              description: `Project "${newProject.project_name}" created successfully with design brief (${uploadResult.sections_found} sections found).`,
+            })
+          } else {
+            toast({
+              title: "Warning",
+              description: `Project created but design brief upload failed: ${uploadResult.error}`,
+              variant: "destructive",
+            })
+          }
+        } catch (uploadError) {
+          console.error("Failed to upload design brief:", uploadError)
+          toast({
+            title: "Warning",
+            description: `Project created but design brief upload failed. You can upload it later.`,
+            variant: "destructive",
+          })
+        }
+      } else {
+        toast({
+          title: "Success",
+          description: `Project "${newProject.project_name}" created successfully.`,
+        })
+      }
 
       // Navigate to the sections page for the new project
       router.push(`/projects/${newProject.id}/sections`)

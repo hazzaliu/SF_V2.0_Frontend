@@ -1,0 +1,44 @@
+
+> my-v0-project@0.1.0 dev
+> next dev
+
+ ⚠ Port 3000 is in use, trying 3001 instead.
+   ▲ Next.js 15.2.4
+   - Local:        http://localhost:3001
+   - Network:      http://192.168.1.158:3001
+   - Environments: .env.local
+
+ ✓ Starting...
+ ✓ Ready in 1162ms
+ ○ Compiling /api-status ...
+ ✓ Compiled /api-status in 1527ms (756 modules)
+ GET /api-status 200 in 1703ms
+ ✓ Compiled in 245ms (360 modules)
+ ✓ Compiled /projects/[id]/questions in 351ms (862 modules)
+🔧 API Configuration: {
+  API_BASE_URL: 'http://localhost:8000',
+  API_VERSION: 'v1',
+  env_var: 'http://localhost:8000'
+}
+ GET /projects/e756f8d5-a952-43fa-9828-591d92a78644/questions 200 in 961ms
+ ✓ Compiled / in 177ms (875 modules)
+ GET / 200 in 269ms
+ ✓ Compiled /_not-found in 374ms (879 modules)
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 418ms
+ ✓ Compiled /projects in 139ms (902 modules)
+ GET /projects 200 in 161ms
+ ○ Compiling /projects/new ...
+ ✓ Compiled /projects/new in 659ms (1087 modules)
+ GET /projects/new 200 in 689ms
+ ✓ Compiled /projects/[id]/sections in 259ms (1103 modules)
+ GET /projects/60756c3d-442f-4ffc-a02a-599dd88568e9/sections 200 in 601ms
+ GET /projects/60756c3d-442f-4ffc-a02a-599dd88568e9/questions 200 in 13ms
+ ✓ Compiled in 676ms (1096 modules)
+ GET /projects/60756c3d-442f-4ffc-a02a-599dd88568e9/questions 200 in 47ms
+🔧 API Configuration: {
+  API_BASE_URL: 'http://localhost:8000',
+  API_VERSION: 'v1',
+  env_var: 'http://localhost:8000'
+}
+ GET /projects/e756f8d5-a952-43fa-9828-591d92a78644/questions 200 in 130ms
+[?25h

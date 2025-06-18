@@ -1,0 +1,289 @@
+
+> my-v0-project@0.1.0 dev
+> next dev
+
+   ▲ Next.js 15.2.4
+   - Local:        http://localhost:3000
+   - Network:      http://192.168.1.158:3000
+   - Environments: .env.local
+
+ ✓ Starting...
+ ✓ Ready in 1209ms
+ ○ Compiling /api-status ...
+ ✓ Compiled /api-status in 1521ms (756 modules)
+ GET /api-status 200 in 1682ms
+ ✓ Compiled in 219ms (360 modules)
+ ✓ Compiled /projects in 305ms (842 modules)
+🔧 API Configuration: {
+  API_BASE_URL: 'http://localhost:8000',
+  API_VERSION: 'v1',
+  env_var: 'http://localhost:8000'
+}
+ GET /projects 200 in 413ms
+ ✓ Compiled /_not-found in 327ms (846 modules)
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 443ms
+ ✓ Compiled /projects/new in 472ms (1045 modules)
+ GET /projects/new 200 in 541ms
+ ✓ Compiled /projects/[id]/sections in 243ms (1069 modules)
+ GET /projects/adeaebad-08ed-4308-a420-dd352b7b6dca/sections 200 in 617ms
+ ✓ Compiled /projects/[id]/questions in 388ms (1090 modules)
+ GET /projects/adeaebad-08ed-4308-a420-dd352b7b6dca/questions 200 in 673ms
+ ✓ Compiled /projects/[id]/order in 306ms (1086 modules)
+ GET /projects/adeaebad-08ed-4308-a420-dd352b7b6dca/order 200 in 657ms
+ ✓ Compiled in 664ms (1100 modules)
+ GET /projects/adeaebad-08ed-4308-a420-dd352b7b6dca/order 200 in 71ms
+ ✓ Compiled in 222ms (1100 modules)
+ GET /projects/adeaebad-08ed-4308-a420-dd352b7b6dca/order 200 in 37ms
+ ✓ Compiled in 268ms (1100 modules)
+ GET /projects/adeaebad-08ed-4308-a420-dd352b7b6dca/order 200 in 23ms
+ ✓ Compiled in 242ms (1100 modules)
+ GET /projects/adeaebad-08ed-4308-a420-dd352b7b6dca/order 200 in 23ms
+ GET /projects/adeaebad-08ed-4308-a420-dd352b7b6dca/sections 200 in 51ms
+ GET /projects/adeaebad-08ed-4308-a420-dd352b7b6dca/questions 200 in 13ms
+ ○ Compiling / ...
+ ✓ Compiled / in 501ms (1114 modules)
+ GET / 200 in 610ms
+ ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ ○ Compiling /_not-found ...
+ ✓ Compiled /_not-found in 551ms (1104 modules)
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 633ms
+ GET /projects 200 in 12ms
+ GET /projects/new 200 in 16ms
+ GET /projects/7f3da51f-7d1a-4de8-b1b8-a847b7a93c9f/sections 200 in 10ms
+ GET /projects/7f3da51f-7d1a-4de8-b1b8-a847b7a93c9f/questions 200 in 9ms
+ ✓ Compiled /projects/[id] in 493ms (1120 modules)
+ GET /projects/7f3da51f-7d1a-4de8-b1b8-a847b7a93c9f 200 in 841ms
+ GET /projects/7f3da51f-7d1a-4de8-b1b8-a847b7a93c9f/questions 200 in 12ms
+ ✓ Compiled / in 129ms (621 modules)
+🔧 API Configuration: {
+  API_BASE_URL: 'http://localhost:8000',
+  API_VERSION: 'v1',
+  env_var: 'http://localhost:8000'
+}
+ GET / 200 in 332ms
+ GET /projects 200 in 333ms
+ ✓ Compiled /_not-found in 418ms (1133 modules)
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 491ms
+ GET /projects/new 200 in 16ms
+ GET /projects/new 200 in 9ms
+ GET /projects/40f324e6-88b7-48fb-8c0b-4894b7d2f147/sections 200 in 29ms
+ GET /projects/40f324e6-88b7-48fb-8c0b-4894b7d2f147/questions 200 in 29ms
+🔧 API Configuration: {
+  API_BASE_URL: 'http://localhost:8000',
+  API_VERSION: 'v1',
+  env_var: 'http://localhost:8000'
+}
+ GET /projects/40f324e6-88b7-48fb-8c0b-4894b7d2f147/questions 200 in 94ms
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 40ms
+ GET /projects/40f324e6-88b7-48fb-8c0b-4894b7d2f147/questions 200 in 105ms
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 50ms
+ GET /projects/40f324e6-88b7-48fb-8c0b-4894b7d2f147/sections 200 in 57ms
+ GET /projects/40f324e6-88b7-48fb-8c0b-4894b7d2f147/questions 200 in 8ms
+ GET /projects 200 in 35ms
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 101ms
+ GET /projects/new 200 in 10ms
+ GET /projects/7324ed2d-f81e-4409-ab6c-019531ec5af1/sections 200 in 42ms
+ GET /projects/7324ed2d-f81e-4409-ab6c-019531ec5af1/questions 200 in 13ms
+ GET /projects/7324ed2d-f81e-4409-ab6c-019531ec5af1/questions 200 in 24ms
+ GET /projects/7324ed2d-f81e-4409-ab6c-019531ec5af1/questions 200 in 103ms
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 52ms
+ GET /projects/7324ed2d-f81e-4409-ab6c-019531ec5af1/sections 200 in 44ms
+ GET /projects/7324ed2d-f81e-4409-ab6c-019531ec5af1/questions 200 in 7ms
+ GET /projects 200 in 41ms
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 47ms
+ GET /projects/new 200 in 11ms
+ ✓ Compiled in 674ms (1118 modules)
+ GET /projects/new 200 in 45ms
+ ✓ Compiled in 551ms (1118 modules)
+ GET /projects/new 200 in 33ms
+ ✓ Compiled in 290ms (1118 modules)
+ GET /projects/new 200 in 21ms
+ ✓ Compiled in 289ms (1118 modules)
+ GET /projects/new 200 in 30ms
+ ✓ Compiled in 351ms (1118 modules)
+ GET /projects/new 200 in 22ms
+ ✓ Compiled in 329ms (1118 modules)
+ GET /projects/new 200 in 23ms
+ ✓ Compiled in 177ms (1118 modules)
+ GET /projects/new 200 in 24ms
+ ✓ Compiled in 395ms (1118 modules)
+ GET /projects/new 200 in 22ms
+ ✓ Compiled in 303ms (1118 modules)
+ GET /projects/new 200 in 22ms
+ ✓ Compiled in 291ms (1118 modules)
+ GET /projects/new 200 in 24ms
+ ✓ Compiled in 328ms (1118 modules)
+ GET /projects/new 200 in 20ms
+ ✓ Compiled in 334ms (1118 modules)
+ GET /projects/new 200 in 26ms
+🔧 API Configuration: {
+  API_BASE_URL: 'http://localhost:8000',
+  API_VERSION: 'v1',
+  env_var: 'http://localhost:8000'
+}
+ GET /projects/new 200 in 239ms
+ ○ Compiling /_not-found ...
+ ✓ Compiled /_not-found in 1023ms (1108 modules)
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 1096ms
+ GET /projects/9398577e-483f-439c-83bb-fda19e72d699/sections 200 in 21ms
+ GET /projects/9398577e-483f-439c-83bb-fda19e72d699/questions 200 in 40ms
+ ✓ Compiled in 472ms (1118 modules)
+ GET /projects/9398577e-483f-439c-83bb-fda19e72d699/questions 200 in 39ms
+ ✓ Compiled in 302ms (1118 modules)
+ GET /projects/9398577e-483f-439c-83bb-fda19e72d699/questions 200 in 31ms
+ ✓ Compiled in 181ms (1118 modules)
+ GET /projects/9398577e-483f-439c-83bb-fda19e72d699/questions 200 in 24ms
+ ✓ Compiled in 226ms (1118 modules)
+ GET /projects/9398577e-483f-439c-83bb-fda19e72d699/questions 200 in 24ms
+ ✓ Compiled in 320ms (1118 modules)
+ GET /projects/9398577e-483f-439c-83bb-fda19e72d699/questions 200 in 23ms
+ ✓ Compiled in 115ms (522 modules)
+ GET /projects/9398577e-483f-439c-83bb-fda19e72d699/questions 200 in 14ms
+ ✓ Compiled in 418ms (1118 modules)
+ GET /projects/9398577e-483f-439c-83bb-fda19e72d699/questions 200 in 32ms
+🔧 API Configuration: {
+  API_BASE_URL: 'http://localhost:8000',
+  API_VERSION: 'v1',
+  env_var: 'http://localhost:8000'
+}
+ GET /projects/9398577e-483f-439c-83bb-fda19e72d699/questions 200 in 93ms
+ ✓ Compiled /_not-found in 426ms (1108 modules)
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 481ms
+ GET /projects/9398577e-483f-439c-83bb-fda19e72d699/sections 200 in 19ms
+ GET /projects/9398577e-483f-439c-83bb-fda19e72d699/questions 200 in 9ms
+ ✓ Compiled in 390ms (1118 modules)
+ GET /projects/9398577e-483f-439c-83bb-fda19e72d699/questions 200 in 39ms
+ ✓ Compiled in 282ms (1118 modules)
+ GET /projects/9398577e-483f-439c-83bb-fda19e72d699/questions 200 in 31ms
+🔧 API Configuration: {
+  API_BASE_URL: 'http://localhost:8000',
+  API_VERSION: 'v1',
+  env_var: 'http://localhost:8000'
+}
+ GET /projects/9398577e-483f-439c-83bb-fda19e72d699/questions 200 in 156ms
+ ✓ Compiled /_not-found in 347ms (1108 modules)
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 394ms
+ GET /projects/9398577e-483f-439c-83bb-fda19e72d699/order 200 in 15ms
+ ○ Compiling /projects/[id]/export ...
+ ✓ Compiled /projects/[id]/export in 610ms (1125 modules)
+ GET /projects/9398577e-483f-439c-83bb-fda19e72d699/export 200 in 938ms
+ ✓ Compiled in 516ms (1127 modules)
+ GET /projects/9398577e-483f-439c-83bb-fda19e72d699/export 200 in 54ms
+ ✓ Compiled in 346ms (1127 modules)
+ GET /projects/9398577e-483f-439c-83bb-fda19e72d699/export 200 in 29ms
+ ✓ Compiled in 249ms (1127 modules)
+ GET /projects/9398577e-483f-439c-83bb-fda19e72d699/export 200 in 20ms
+ ✓ Compiled in 348ms (1127 modules)
+ GET /projects/9398577e-483f-439c-83bb-fda19e72d699/export 200 in 26ms
+ ✓ Compiled in 377ms (1127 modules)
+ GET /projects/9398577e-483f-439c-83bb-fda19e72d699/export 200 in 35ms
+ ✓ Compiled in 184ms (1127 modules)
+ GET /projects/9398577e-483f-439c-83bb-fda19e72d699/export 200 in 92ms
+ ✓ Compiled / in 203ms (605 modules)
+ GET / 200 in 258ms
+ ✓ Compiled /projects in 255ms (617 modules)
+ GET /projects 200 in 295ms
+ GET /projects/new 200 in 13ms
+ GET /projects/dd91994b-c20f-4a2a-90f8-54045775b071/sections 200 in 12ms
+ ✓ Compiled /projects/[id] in 207ms (621 modules)
+ GET /projects/dd91994b-c20f-4a2a-90f8-54045775b071 200 in 243ms
+ ✓ Compiled /projects/[id]/questions in 123ms (626 modules)
+ GET /projects/dd91994b-c20f-4a2a-90f8-54045775b071/questions 200 in 163ms
+ GET /projects/dd91994b-c20f-4a2a-90f8-54045775b071/questions 200 in 6ms
+ ✓ Compiled /projects/[id]/order in 134ms (612 modules)
+ GET /projects/dd91994b-c20f-4a2a-90f8-54045775b071/order 200 in 170ms
+ GET /projects/dd91994b-c20f-4a2a-90f8-54045775b071/questions 200 in 9ms
+ GET /projects/dd91994b-c20f-4a2a-90f8-54045775b071/order 200 in 10ms
+ ✓ Compiled /projects/[id]/export in 176ms (614 modules)
+ GET /projects/dd91994b-c20f-4a2a-90f8-54045775b071/export 200 in 215ms
+🔧 API Configuration: {
+  API_BASE_URL: 'http://localhost:8000',
+  API_VERSION: 'v1',
+  env_var: 'http://localhost:8000'
+}
+ GET /projects/dd91994b-c20f-4a2a-90f8-54045775b071/export 200 in 94ms
+ ✓ Compiled /_not-found in 328ms (1106 modules)
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 381ms
+ ✓ Compiled in 693ms (1116 modules)
+ GET /projects/dd91994b-c20f-4a2a-90f8-54045775b071/export 200 in 53ms
+ ✓ Compiled / in 407ms (594 modules)
+ GET / 200 in 467ms
+ ✓ Compiled /projects in 276ms (605 modules)
+ GET /projects 200 in 309ms
+ ✓ Compiled /projects/new in 121ms (632 modules)
+ GET /projects/new 200 in 155ms
+ GET /projects/4304dcfd-fa29-4330-a034-c5ad88a3a055/sections 200 in 17ms
+ GET /projects/4304dcfd-fa29-4330-a034-c5ad88a3a055/questions 200 in 12ms
+ GET /projects/4304dcfd-fa29-4330-a034-c5ad88a3a055/questions 200 in 30ms
+ GET /projects/4304dcfd-fa29-4330-a034-c5ad88a3a055/order 200 in 32ms
+ GET /projects/4304dcfd-fa29-4330-a034-c5ad88a3a055/order 200 in 19ms
+ GET /projects/4304dcfd-fa29-4330-a034-c5ad88a3a055/export 200 in 31ms
+ GET /projects/4304dcfd-fa29-4330-a034-c5ad88a3a055/order 200 in 32ms
+ GET /projects/4304dcfd-fa29-4330-a034-c5ad88a3a055/questions 200 in 11ms
+🔧 API Configuration: {
+  API_BASE_URL: 'http://localhost:8000',
+  API_VERSION: 'v1',
+  env_var: 'http://localhost:8000'
+}
+ GET /projects/4304dcfd-fa29-4330-a034-c5ad88a3a055/questions 200 in 315ms
+ GET / 200 in 53ms
+ GET /projects 200 in 8ms
+ GET /projects/new 200 in 6ms
+ GET /projects/ffcc9db3-bcb9-460d-bc76-a087c88351cf/sections 200 in 20ms
+ GET /projects/ffcc9db3-bcb9-460d-bc76-a087c88351cf/questions 200 in 9ms
+ GET /projects/ffcc9db3-bcb9-460d-bc76-a087c88351cf/questions 200 in 179ms
+ ○ Compiling /_not-found ...
+ ✓ Compiled /_not-found in 703ms (1131 modules)
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 779ms
+ GET /projects/4304dcfd-fa29-4330-a034-c5ad88a3a055/questions 200 in 18ms
+ GET /projects/ffcc9db3-bcb9-460d-bc76-a087c88351cf/questions 200 in 11ms
+🔧 API Configuration: {
+  API_BASE_URL: 'http://localhost:8000',
+  API_VERSION: 'v1',
+  env_var: 'http://localhost:8000'
+}
+ GET /projects/ffcc9db3-bcb9-460d-bc76-a087c88351cf/questions 200 in 163ms
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 44ms
+ GET /projects/ffcc9db3-bcb9-460d-bc76-a087c88351cf/questions 200 in 81ms
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 40ms
+ GET /projects/ffcc9db3-bcb9-460d-bc76-a087c88351cf/order 200 in 37ms
+ GET /projects/ffcc9db3-bcb9-460d-bc76-a087c88351cf/export 200 in 17ms
+ GET /projects/ffcc9db3-bcb9-460d-bc76-a087c88351cf/order 200 in 43ms
+ GET /projects/ffcc9db3-bcb9-460d-bc76-a087c88351cf/export 200 in 7ms
+ ✓ Compiled in 658ms (1127 modules)
+ GET /projects/4304dcfd-fa29-4330-a034-c5ad88a3a055/questions 200 in 40ms
+ GET /projects/ffcc9db3-bcb9-460d-bc76-a087c88351cf/export 200 in 17ms
+ ✓ Compiled / in 241ms (605 modules)
+ GET / 200 in 293ms
+ ✓ Compiled /projects in 83ms (617 modules)
+ GET /projects 200 in 106ms
+ GET /projects/new 200 in 38ms
+ GET /projects/24bf01b9-6b81-4776-b968-aa8dea43ebcb/sections 200 in 13ms
+ ✓ Compiled /projects/[id] in 316ms (624 modules)
+ GET /projects/24bf01b9-6b81-4776-b968-aa8dea43ebcb 200 in 341ms
+ GET /projects/24bf01b9-6b81-4776-b968-aa8dea43ebcb/questions 200 in 14ms
+ GET /projects/24bf01b9-6b81-4776-b968-aa8dea43ebcb/order 200 in 14ms
+ GET /projects/24bf01b9-6b81-4776-b968-aa8dea43ebcb/export 200 in 39ms
+ ✓ Compiled in 433ms (1127 modules)
+ GET /projects/4304dcfd-fa29-4330-a034-c5ad88a3a055/questions 200 in 59ms
+🔧 API Configuration: {
+  API_BASE_URL: 'http://localhost:8000',
+  API_VERSION: 'v1',
+  env_var: 'http://localhost:8000'
+}
+ GET /projects/24bf01b9-6b81-4776-b968-aa8dea43ebcb/export 200 in 192ms
+ ○ Compiling /_not-found ...
+ ✓ Compiled /_not-found in 991ms (1117 modules)
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 1055ms
+ ✓ Compiled /projects/[id]/finished in 80ms (610 modules)
+ ✓ Compiled in 307ms (524 modules)
+ GET /projects 200 in 461ms
+ GET /projects/24bf01b9-6b81-4776-b968-aa8dea43ebcb/finished 200 in 667ms
+ GET /projects/new 200 in 14ms
+ GET /projects/d9f26e50-2ba6-47e0-a9f5-06966df5556b/sections 200 in 14ms
+ GET /projects/d9f26e50-2ba6-47e0-a9f5-06966df5556b/questions 200 in 14ms
+ GET /projects/d9f26e50-2ba6-47e0-a9f5-06966df5556b/order 200 in 35ms
+ GET /projects/d9f26e50-2ba6-47e0-a9f5-06966df5556b/export 200 in 16ms
+ ✓ Compiled in 577ms (1132 modules)
+ GET /projects/4304dcfd-fa29-4330-a034-c5ad88a3a055/questions 200 in 47ms
+ GET /projects/d9f26e50-2ba6-47e0-a9f5-06966df5556b/export 200 in 21ms

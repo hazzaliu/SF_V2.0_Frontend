@@ -1,0 +1,311 @@
+
+> my-v0-project@0.1.0 dev
+> next dev
+
+   ▲ Next.js 15.2.4
+   - Local:        http://localhost:3000
+   - Network:      http://192.168.1.158:3000
+   - Environments: .env.local
+
+ ✓ Starting...
+ ✓ Ready in 1157ms
+ ○ Compiling /api-status ...
+ ✓ Compiled /api-status in 1391ms (756 modules)
+ GET /api-status 200 in 1547ms
+ ✓ Compiled in 211ms (360 modules)
+ ✓ Compiled /projects/[id]/questions in 385ms (862 modules)
+🔧 API Configuration: {
+  API_BASE_URL: 'http://localhost:8000',
+  API_VERSION: 'v1',
+  env_var: 'http://localhost:8000'
+}
+ GET /projects/e756f8d5-a952-43fa-9828-591d92a78644/questions 200 in 798ms
+ ✓ Compiled /projects in 208ms (885 modules)
+🔧 API Configuration: {
+  API_BASE_URL: 'http://localhost:8000',
+  API_VERSION: 'v1',
+  env_var: 'http://localhost:8000'
+}
+ GET /projects 200 in 288ms
+ ✓ Compiled /_not-found in 185ms (889 modules)
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 225ms
+ ○ Compiling /projects/new ...
+ ✓ Compiled /projects/new in 535ms (1065 modules)
+ GET /projects/new 200 in 565ms
+ ✓ Compiled /projects/[id]/sections in 210ms (1068 modules)
+ GET /projects/b4f07f26-b852-4cc0-9002-271d79aae196/sections 200 in 555ms
+ ✓ Compiled /projects/[id]/questions in 166ms (591 modules)
+ GET /projects/b4f07f26-b852-4cc0-9002-271d79aae196/questions 200 in 194ms
+ ✓ Compiled in 640ms (1091 modules)
+ GET /projects/b4f07f26-b852-4cc0-9002-271d79aae196/questions 200 in 46ms
+ ✓ Compiled in 238ms (1091 modules)
+ GET /projects/b4f07f26-b852-4cc0-9002-271d79aae196/questions 200 in 25ms
+ ✓ Compiled in 464ms (1091 modules)
+ GET /projects/b4f07f26-b852-4cc0-9002-271d79aae196/questions 200 in 73ms
+ ✓ Compiled in 454ms (1091 modules)
+ GET /projects/b4f07f26-b852-4cc0-9002-271d79aae196/questions 200 in 27ms
+🔧 API Configuration: {
+  API_BASE_URL: 'http://localhost:8000',
+  API_VERSION: 'v1',
+  env_var: 'http://localhost:8000'
+}
+ GET /projects/b4f07f26-b852-4cc0-9002-271d79aae196/questions 200 in 113ms
+ ○ Compiling /_not-found ...
+ ✓ Compiled /_not-found in 535ms (1081 modules)
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 603ms
+ GET /_next/static/css/app/layout.css?v=1750225070627 404 in 607ms
+ GET /_next/static/chunks/webpack.js?v=1750225070627 404 in 671ms
+ GET /_next/static/chunks/app-pages-internals.js 404 in 60ms
+ GET /_next/static/chunks/main-app.js?v=1750225070627 404 in 62ms
+ GET /_next/static/chunks/app/projects/%5Bid%5D/questions/page.js 404 in 60ms
+ GET /_next/static/chunks/app/layout.js 404 in 60ms
+ ⨯ Error: Cannot find module './151.js'
+Require stack:
+- /Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/.next/server/webpack-runtime.js
+- /Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/.next/server/app/_not-found/page.js
+- /Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/node_modules/next/dist/server/require.js
+- /Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/node_modules/next/dist/server/load-components.js
+- /Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/node_modules/next/dist/build/utils.js
+- /Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/node_modules/next/dist/build/swc/options.js
+- /Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/node_modules/next/dist/build/swc/index.js
+- /Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/node_modules/next/dist/build/analysis/parse-module.js
+- /Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/node_modules/next/dist/build/analysis/get-page-static-info.js
+- /Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/node_modules/next/dist/server/lib/router-server.js
+- /Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/node_modules/next/dist/server/lib/start-server.js
+    at __webpack_require__.f.require (.next/server/webpack-runtime.js:203:28)
+    at <unknown> (.next/server/webpack-runtime.js:111:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (.next/server/webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (.next/server/webpack-runtime.js:162:22)
+    at <unknown> (.next/server/app/projects/[id]/questions/page.js:8:7494)
+    at Object.<anonymous> (.next/server/app/projects/[id]/questions/page.js:8:7547) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array],
+  page: '/projects/b4f07f26-b852-4cc0-9002-271d79aae196/questions'
+}
+ ○ Compiling /_error ...
+ ✓ Compiled /_error in 626ms (1407 modules)
+Warning: useLayoutEffect does nothing on the server, because its effect cannot be encoded into the server renderer's output format. This will lead to a mismatch between the initial, non-hydrated UI and the intended UI. To avoid this, useLayoutEffect should only be used in components that render exclusively on the client. See https://reactjs.org/link/uselayouteffect-ssr for common fixes.
+    at ShadowPortal (/Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/node_modules/next/src/client/components/react-dev-overlay/ui/components/shadow-portal.tsx:5:32)
+    at DevOverlay (/Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/node_modules/next/src/client/components/react-dev-overlay/ui/dev-overlay.tsx:14:3)
+    at ReactDevOverlay (/Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/node_modules/next/src/server/dev/next-dev-server.ts:82:10)
+    at div
+    at Body (webpack://next/dist/src/server/render.tsx:1263:19)
+Warning: useLayoutEffect does nothing on the server, because its effect cannot be encoded into the server renderer's output format. This will lead to a mismatch between the initial, non-hydrated UI and the intended UI. To avoid this, useLayoutEffect should only be used in components that render exclusively on the client. See https://reactjs.org/link/uselayouteffect-ssr for common fixes.
+    at ShadowPortal (/Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/node_modules/next/src/client/components/react-dev-overlay/ui/components/shadow-portal.tsx:5:32)
+    at DevOverlay (/Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/node_modules/next/src/client/components/react-dev-overlay/ui/dev-overlay.tsx:14:3)
+    at ReactDevOverlay (/Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/node_modules/next/src/server/dev/next-dev-server.ts:82:10)
+    at div
+    at Body (webpack://next/dist/src/server/render.tsx:1263:19)
+ GET /projects/b4f07f26-b852-4cc0-9002-271d79aae196/questions 500 in 955ms
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 69ms
+ ✓ Compiled in 152ms (743 modules)
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/.next/server/app-paths-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/.next/server/app-paths-manifest.json'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/.next/server/app-paths-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/.next/server/app-paths-manifest.json'
+}
+Warning: useLayoutEffect does nothing on the server, because its effect cannot be encoded into the server renderer's output format. This will lead to a mismatch between the initial, non-hydrated UI and the intended UI. To avoid this, useLayoutEffect should only be used in components that render exclusively on the client. See https://reactjs.org/link/uselayouteffect-ssr for common fixes.
+    at ShadowPortal (/Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/node_modules/next/src/client/components/react-dev-overlay/ui/components/shadow-portal.tsx:5:32)
+    at DevOverlay (/Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/node_modules/next/src/client/components/react-dev-overlay/ui/dev-overlay.tsx:14:3)
+    at ReactDevOverlay (/Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/node_modules/next/src/server/dev/next-dev-server.ts:82:10)
+    at div
+    at Body (/Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/node_modules/next/src/server/render.tsx:1263:19)
+Warning: useLayoutEffect does nothing on the server, because its effect cannot be encoded into the server renderer's output format. This will lead to a mismatch between the initial, non-hydrated UI and the intended UI. To avoid this, useLayoutEffect should only be used in components that render exclusively on the client. See https://reactjs.org/link/uselayouteffect-ssr for common fixes.
+    at ShadowPortal (/Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/node_modules/next/src/client/components/react-dev-overlay/ui/components/shadow-portal.tsx:5:32)
+    at DevOverlay (/Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/node_modules/next/src/client/components/react-dev-overlay/ui/dev-overlay.tsx:14:3)
+    at ReactDevOverlay (/Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/node_modules/next/src/server/dev/next-dev-server.ts:82:10)
+    at div
+    at Body (/Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/node_modules/next/src/server/render.tsx:1263:19)
+Warning: useLayoutEffect does nothing on the server, because its effect cannot be encoded into the server renderer's output format. This will lead to a mismatch between the initial, non-hydrated UI and the intended UI. To avoid this, useLayoutEffect should only be used in components that render exclusively on the client. See https://reactjs.org/link/uselayouteffect-ssr for common fixes.
+    at ShadowPortal (/Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/node_modules/next/src/client/components/react-dev-overlay/ui/components/shadow-portal.tsx:5:32)
+    at DevOverlay (/Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/node_modules/next/src/client/components/react-dev-overlay/ui/dev-overlay.tsx:14:3)
+    at ReactDevOverlay (/Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/node_modules/next/src/server/dev/next-dev-server.ts:82:10)
+    at div
+    at Body (/Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/node_modules/next/src/server/render.tsx:1263:19)
+Warning: useLayoutEffect does nothing on the server, because its effect cannot be encoded into the server renderer's output format. This will lead to a mismatch between the initial, non-hydrated UI and the intended UI. To avoid this, useLayoutEffect should only be used in components that render exclusively on the client. See https://reactjs.org/link/uselayouteffect-ssr for common fixes.
+    at ShadowPortal (/Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/node_modules/next/src/client/components/react-dev-overlay/ui/components/shadow-portal.tsx:5:32)
+    at DevOverlay (/Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/node_modules/next/src/client/components/react-dev-overlay/ui/dev-overlay.tsx:14:3)
+    at ReactDevOverlay (/Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/node_modules/next/src/server/dev/next-dev-server.ts:82:10)
+    at div
+    at Body (/Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/node_modules/next/src/server/render.tsx:1263:19)
+ GET /projects/b4f07f26-b852-4cc0-9002-271d79aae196/questions 500 in 1678ms
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/.next/server/app-paths-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/.next/server/app-paths-manifest.json'
+}
+Warning: useLayoutEffect does nothing on the server, because its effect cannot be encoded into the server renderer's output format. This will lead to a mismatch between the initial, non-hydrated UI and the intended UI. To avoid this, useLayoutEffect should only be used in components that render exclusively on the client. See https://reactjs.org/link/uselayouteffect-ssr for common fixes.
+    at ShadowPortal (/Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/node_modules/next/src/client/components/react-dev-overlay/ui/components/shadow-portal.tsx:5:32)
+    at DevOverlay (/Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/node_modules/next/src/client/components/react-dev-overlay/ui/dev-overlay.tsx:14:3)
+    at ReactDevOverlay (/Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/node_modules/next/src/server/dev/next-dev-server.ts:82:10)
+    at div
+    at Body (/Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/node_modules/next/src/server/render.tsx:1263:19)
+Warning: useLayoutEffect does nothing on the server, because its effect cannot be encoded into the server renderer's output format. This will lead to a mismatch between the initial, non-hydrated UI and the intended UI. To avoid this, useLayoutEffect should only be used in components that render exclusively on the client. See https://reactjs.org/link/uselayouteffect-ssr for common fixes.
+    at ShadowPortal (/Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/node_modules/next/src/client/components/react-dev-overlay/ui/components/shadow-portal.tsx:5:32)
+    at DevOverlay (/Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/node_modules/next/src/client/components/react-dev-overlay/ui/dev-overlay.tsx:14:3)
+    at ReactDevOverlay (/Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/node_modules/next/src/server/dev/next-dev-server.ts:82:10)
+    at div
+    at Body (/Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/node_modules/next/src/server/render.tsx:1263:19)
+ GET /.well-known/appspecific/com.chrome.devtools.json 500 in 264ms
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename '/Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/.next/cache/webpack/client-development-fallback/0.pack.gz_' -> '/Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/.next/cache/webpack/client-development-fallback/0.pack.gz'
+ ✓ Compiled in 180ms (743 modules)
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/.next/server/app-paths-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/.next/server/app-paths-manifest.json'
+}
+Warning: useLayoutEffect does nothing on the server, because its effect cannot be encoded into the server renderer's output format. This will lead to a mismatch between the initial, non-hydrated UI and the intended UI. To avoid this, useLayoutEffect should only be used in components that render exclusively on the client. See https://reactjs.org/link/uselayouteffect-ssr for common fixes.
+    at ShadowPortal (/Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/node_modules/next/src/client/components/react-dev-overlay/ui/components/shadow-portal.tsx:5:32)
+    at DevOverlay (/Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/node_modules/next/src/client/components/react-dev-overlay/ui/dev-overlay.tsx:14:3)
+    at ReactDevOverlay (/Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/node_modules/next/src/server/dev/next-dev-server.ts:82:10)
+    at div
+    at Body (/Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/node_modules/next/src/server/render.tsx:1263:19)
+Warning: useLayoutEffect does nothing on the server, because its effect cannot be encoded into the server renderer's output format. This will lead to a mismatch between the initial, non-hydrated UI and the intended UI. To avoid this, useLayoutEffect should only be used in components that render exclusively on the client. See https://reactjs.org/link/uselayouteffect-ssr for common fixes.
+    at ShadowPortal (/Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/node_modules/next/src/client/components/react-dev-overlay/ui/components/shadow-portal.tsx:5:32)
+    at DevOverlay (/Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/node_modules/next/src/client/components/react-dev-overlay/ui/dev-overlay.tsx:14:3)
+    at ReactDevOverlay (/Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/node_modules/next/src/server/dev/next-dev-server.ts:82:10)
+    at div
+    at Body (/Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/node_modules/next/src/server/render.tsx:1263:19)
+ GET /_next/static/webpack/41c6f9d3fac33a02.webpack.hot-update.json 500 in 27ms
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/.next/server/app-paths-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/.next/server/app-paths-manifest.json'
+}
+Warning: useLayoutEffect does nothing on the server, because its effect cannot be encoded into the server renderer's output format. This will lead to a mismatch between the initial, non-hydrated UI and the intended UI. To avoid this, useLayoutEffect should only be used in components that render exclusively on the client. See https://reactjs.org/link/uselayouteffect-ssr for common fixes.
+    at ShadowPortal (/Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/node_modules/next/src/client/components/react-dev-overlay/ui/components/shadow-portal.tsx:5:32)
+    at DevOverlay (/Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/node_modules/next/src/client/components/react-dev-overlay/ui/dev-overlay.tsx:14:3)
+    at ReactDevOverlay (/Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/node_modules/next/src/server/dev/next-dev-server.ts:82:10)
+    at div
+    at Body (/Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/node_modules/next/src/server/render.tsx:1263:19)
+Warning: useLayoutEffect does nothing on the server, because its effect cannot be encoded into the server renderer's output format. This will lead to a mismatch between the initial, non-hydrated UI and the intended UI. To avoid this, useLayoutEffect should only be used in components that render exclusively on the client. See https://reactjs.org/link/uselayouteffect-ssr for common fixes.
+    at ShadowPortal (/Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/node_modules/next/src/client/components/react-dev-overlay/ui/components/shadow-portal.tsx:5:32)
+    at DevOverlay (/Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/node_modules/next/src/client/components/react-dev-overlay/ui/dev-overlay.tsx:14:3)
+    at ReactDevOverlay (/Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/node_modules/next/src/server/dev/next-dev-server.ts:82:10)
+    at div
+    at Body (/Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/node_modules/next/src/server/render.tsx:1263:19)
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/.next/server/app-paths-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/.next/server/app-paths-manifest.json'
+}
+Warning: useLayoutEffect does nothing on the server, because its effect cannot be encoded into the server renderer's output format. This will lead to a mismatch between the initial, non-hydrated UI and the intended UI. To avoid this, useLayoutEffect should only be used in components that render exclusively on the client. See https://reactjs.org/link/uselayouteffect-ssr for common fixes.
+    at ShadowPortal (/Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/node_modules/next/src/client/components/react-dev-overlay/ui/components/shadow-portal.tsx:5:32)
+    at DevOverlay (/Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/node_modules/next/src/client/components/react-dev-overlay/ui/dev-overlay.tsx:14:3)
+    at ReactDevOverlay (/Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/node_modules/next/src/server/dev/next-dev-server.ts:82:10)
+    at div
+    at Body (/Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/node_modules/next/src/server/render.tsx:1263:19)
+Warning: useLayoutEffect does nothing on the server, because its effect cannot be encoded into the server renderer's output format. This will lead to a mismatch between the initial, non-hydrated UI and the intended UI. To avoid this, useLayoutEffect should only be used in components that render exclusively on the client. See https://reactjs.org/link/uselayouteffect-ssr for common fixes.
+    at ShadowPortal (/Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/node_modules/next/src/client/components/react-dev-overlay/ui/components/shadow-portal.tsx:5:32)
+    at DevOverlay (/Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/node_modules/next/src/client/components/react-dev-overlay/ui/dev-overlay.tsx:14:3)
+    at ReactDevOverlay (/Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/node_modules/next/src/server/dev/next-dev-server.ts:82:10)
+    at div
+    at Body (/Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/node_modules/next/src/server/render.tsx:1263:19)
+ GET /projects/b4f07f26-b852-4cc0-9002-271d79aae196/questions 500 in 24ms
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/.next/server/app-paths-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/.next/server/app-paths-manifest.json'
+}
+Warning: useLayoutEffect does nothing on the server, because its effect cannot be encoded into the server renderer's output format. This will lead to a mismatch between the initial, non-hydrated UI and the intended UI. To avoid this, useLayoutEffect should only be used in components that render exclusively on the client. See https://reactjs.org/link/uselayouteffect-ssr for common fixes.
+    at ShadowPortal (/Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/node_modules/next/src/client/components/react-dev-overlay/ui/components/shadow-portal.tsx:5:32)
+    at DevOverlay (/Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/node_modules/next/src/client/components/react-dev-overlay/ui/dev-overlay.tsx:14:3)
+    at ReactDevOverlay (/Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/node_modules/next/src/server/dev/next-dev-server.ts:82:10)
+    at div
+    at Body (/Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/node_modules/next/src/server/render.tsx:1263:19)
+Warning: useLayoutEffect does nothing on the server, because its effect cannot be encoded into the server renderer's output format. This will lead to a mismatch between the initial, non-hydrated UI and the intended UI. To avoid this, useLayoutEffect should only be used in components that render exclusively on the client. See https://reactjs.org/link/uselayouteffect-ssr for common fixes.
+    at ShadowPortal (/Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/node_modules/next/src/client/components/react-dev-overlay/ui/components/shadow-portal.tsx:5:32)
+    at DevOverlay (/Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/node_modules/next/src/client/components/react-dev-overlay/ui/dev-overlay.tsx:14:3)
+    at ReactDevOverlay (/Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/node_modules/next/src/server/dev/next-dev-server.ts:82:10)
+    at div
+    at Body (/Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/node_modules/next/src/server/render.tsx:1263:19)
+ GET /.well-known/appspecific/com.chrome.devtools.json 500 in 83ms
+[Error: ENOENT: no such file or directory, stat '/Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/.next/cache/webpack/client-development/5.pack.gz'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'stat',
+  path: '/Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/.next/cache/webpack/client-development/5.pack.gz'
+}
+ ⨯ unhandledRejection: [Error: ENOENT: no such file or directory, stat '/Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/.next/cache/webpack/client-development/5.pack.gz'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'stat',
+  path: '/Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/.next/cache/webpack/client-development/5.pack.gz'
+}
+ ⨯ unhandledRejection:  [Error: ENOENT: no such file or directory, stat '/Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/.next/cache/webpack/client-development/5.pack.gz'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'stat',
+  path: '/Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/.next/cache/webpack/client-development/5.pack.gz'
+}
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, stat '/Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/.next/cache/webpack/client-development/5.pack.gz'
+ ✓ Compiled /api-status in 122ms (687 modules)
+ ⨯ [TypeError: Cannot read properties of undefined (reading 'clientModules')] {
+  page: '/api-status'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/.next/server/pages/_document.js'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/.next/server/pages/_document.js'
+}
+Warning: useLayoutEffect does nothing on the server, because its effect cannot be encoded into the server renderer's output format. This will lead to a mismatch between the initial, non-hydrated UI and the intended UI. To avoid this, useLayoutEffect should only be used in components that render exclusively on the client. See https://reactjs.org/link/uselayouteffect-ssr for common fixes.
+    at ShadowPortal (/Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/node_modules/next/src/client/components/react-dev-overlay/ui/components/shadow-portal.tsx:5:32)
+    at DevOverlay (/Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/node_modules/next/src/client/components/react-dev-overlay/ui/dev-overlay.tsx:14:3)
+    at ReactDevOverlay (/Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/node_modules/next/src/server/dev/next-dev-server.ts:82:10)
+    at div
+    at Body (/Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/node_modules/next/src/server/render.tsx:1263:19)
+Warning: useLayoutEffect does nothing on the server, because its effect cannot be encoded into the server renderer's output format. This will lead to a mismatch between the initial, non-hydrated UI and the intended UI. To avoid this, useLayoutEffect should only be used in components that render exclusively on the client. See https://reactjs.org/link/uselayouteffect-ssr for common fixes.
+    at ShadowPortal (/Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/node_modules/next/src/client/components/react-dev-overlay/ui/components/shadow-portal.tsx:5:32)
+    at DevOverlay (/Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/node_modules/next/src/client/components/react-dev-overlay/ui/dev-overlay.tsx:14:3)
+    at ReactDevOverlay (/Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/node_modules/next/src/server/dev/next-dev-server.ts:82:10)
+    at div
+    at Body (/Users/admin/Desktop/V2.0 backend/SF_V2.0_Modular/SF_Frontend/node_modules/next/src/server/render.tsx:1263:19)
+ GET /api-status 500 in 573ms
+ GET /projects/b4f07f26-b852-4cc0-9002-271d79aae196/questions 404 in 250ms
+ GET /projects/b4f07f26-b852-4cc0-9002-271d79aae196/questions 404 in 226ms
+ GET /projects/b4f07f26-b852-4cc0-9002-271d79aae196/questions 404 in 207ms
+ GET /projects/b4f07f26-b852-4cc0-9002-271d79aae196/questions 404 in 205ms
+ GET /projects/b4f07f26-b852-4cc0-9002-271d79aae196/questions 404 in 203ms
+ GET /projects/b4f07f26-b852-4cc0-9002-271d79aae196/questions 404 in 205ms
+ GET /projects/b4f07f26-b852-4cc0-9002-271d79aae196/questions 404 in 209ms
+ GET /projects/b4f07f26-b852-4cc0-9002-271d79aae196/questions 404 in 207ms
+ GET /projects/b4f07f26-b852-4cc0-9002-271d79aae196/questions 404 in 206ms
+ GET /projects/b4f07f26-b852-4cc0-9002-271d79aae196/questions 404 in 205ms
+ GET /projects/b4f07f26-b852-4cc0-9002-271d79aae196/questions 404 in 204ms
+ GET /projects/b4f07f26-b852-4cc0-9002-271d79aae196/questions 404 in 208ms
+ GET /projects/b4f07f26-b852-4cc0-9002-271d79aae196/questions 404 in 205ms
+ GET /projects/b4f07f26-b852-4cc0-9002-271d79aae196/questions 404 in 205ms
+ GET /projects/b4f07f26-b852-4cc0-9002-271d79aae196/questions 404 in 205ms
+ GET /projects/b4f07f26-b852-4cc0-9002-271d79aae196/questions 404 in 206ms
+ GET /projects/b4f07f26-b852-4cc0-9002-271d79aae196/questions 404 in 206ms
+ GET /projects/b4f07f26-b852-4cc0-9002-271d79aae196/questions 404 in 206ms
+ GET /projects/b4f07f26-b852-4cc0-9002-271d79aae196/questions 404 in 204ms
+ GET /projects/b4f07f26-b852-4cc0-9002-271d79aae196/questions 404 in 204ms
+ GET /projects/b4f07f26-b852-4cc0-9002-271d79aae196/questions 404 in 205ms
+ GET /projects/b4f07f26-b852-4cc0-9002-271d79aae196/questions 404 in 204ms
+ GET /projects/b4f07f26-b852-4cc0-9002-271d79aae196/questions 404 in 205ms
+ GET /projects/b4f07f26-b852-4cc0-9002-271d79aae196/questions 404 in 205ms
+ GET /projects/b4f07f26-b852-4cc0-9002-271d79aae196/questions 404 in 206ms
+ GET /projects/b4f07f26-b852-4cc0-9002-271d79aae196/questions 404 in 203ms
+ GET /projects/b4f07f26-b852-4cc0-9002-271d79aae196/questions 404 in 204ms
+ GET /projects/b4f07f26-b852-4cc0-9002-271d79aae196/questions 404 in 236ms
+ GET /projects/b4f07f26-b852-4cc0-9002-271d79aae196/questions 404 in 210ms
+[?25h
